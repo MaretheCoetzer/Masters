@@ -1,0 +1,56 @@
+[2023-08-22T21:21:45+0200.0052][INFO ][<ipython-input-1-cada5e24d9ae>] - -------------------------------------------------------
+[2023-08-22T21:21:45+0200.0052][INFO ][<ipython-input-1-cada5e24d9ae>] - Gait name: TwoD_SS_62
+[2023-08-22T21:21:45+0200.0052][INFO ][<ipython-input-1-cada5e24d9ae>] - 2D SS walk - initial and final positions the same
+[2023-08-22T21:21:45+0200.0064][INFO ][<ipython-input-1-cada5e24d9ae>] - No contact order enforced, No body configuration enforced
+[2023-08-22T21:21:45+0200.0065][INFO ][<ipython-input-1-cada5e24d9ae>] - Slip and friction implemented as slack variables
+[2023-08-22T21:21:45+0200.0068][INFO ][<ipython-input-1-cada5e24d9ae>] - Cost func = return sum(((m.tau_h1[n]**2+m.tau_k1[n]**2+m.tau_h2[n]**2+m.tau_k2[n]**2+m.tau_h3[n]**2+m.tau_k3[n]**2+m.tau_h4[n]**2+m.tau_k4[n]**2)*m.h[n]) for n in range(1,N+1))/m.q0[N,'x']
+[2023-08-22T21:21:45+0200.0070][INFO ][<ipython-input-1-cada5e24d9ae>] - Final eps value = 0.0001
+[2023-08-22T21:21:45+0200.0072][INFO ][<ipython-input-1-cada5e24d9ae>] - m.vel = 0.11 m/s, m.distance = 0.05 m
+[2023-08-22T21:21:45+0200.0073][INFO ][<ipython-input-1-cada5e24d9ae>] - Nodes = 40, time variable 0.3-0.01
+[2023-08-22T21:21:45+0200.0075][INFO ][<ipython-input-1-cada5e24d9ae>] - Fixed knee constraints and added hip constraints
+[2023-08-22T21:21:45+0200.0076][INFO ][<ipython-input-1-cada5e24d9ae>] - -------------------------------------------------------
+[2023-08-22T21:26:44+0200.0189][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 1000.0
+[2023-08-22T21:26:52+0200.0173][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 100.0
+[2023-08-22T21:27:51+0200.0937][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 10.0
+[2023-08-22T21:33:22+0200.0919][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 1.0
+[2023-08-22T21:34:55+0200.0272][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 0.1
+[2023-08-22T21:36:22+0200.0251][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 0.01
+[2023-08-22T21:37:43+0200.0153][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 0.001
+[2023-08-22T21:43:38+0200.0594][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 0.0001
+[2023-08-22T22:11:46+0200.0353][INFO ][<ipython-input-31-598ac6f1f495>] - Trajectory Optimisation Completed
+[2023-08-22T22:11:46+0200.0353][INFO ][<ipython-input-31-598ac6f1f495>] - Distance travelled: 0.13593187158087466 m
+[2023-08-22T22:11:46+0200.0353][INFO ][<ipython-input-31-598ac6f1f495>] - Gait Duration: 1.126195549039923 s
+[2023-08-22T22:11:46+0200.0353][INFO ][<ipython-input-31-598ac6f1f495>] - velocity (dist/time): 0.10999999999999997
+[2023-08-22T22:11:46+0200.0353][INFO ][<ipython-input-31-598ac6f1f495>] - Final velocity: 0.06971554841324396
+[2023-08-22T22:11:46+0200.0369][INFO ][<ipython-input-31-598ac6f1f495>] - average x velocity: 0.08867575343591225
+[2023-08-22T22:11:46+0200.0369][INFO ][<ipython-input-31-598ac6f1f495>] - minimum x velocity: 0.03521747754467299
+[2023-08-22T22:11:46+0200.0369][INFO ][<ipython-input-31-598ac6f1f495>] - maximum x velocity: 0.23429523095610474
+[2023-08-22T22:11:46+0200.0369][INFO ][<ipython-input-31-598ac6f1f495>] - -------------------------------------------------------
+[2023-08-22T22:16:04+0200.0659][INFO ][<ipython-input-1-0de80fca3aa4>] - -------------------------------------------------------
+[2023-08-22T22:16:04+0200.0659][INFO ][<ipython-input-1-0de80fca3aa4>] - Gait name: TwoD_SS_63
+[2023-08-22T22:16:04+0200.0659][INFO ][<ipython-input-1-0de80fca3aa4>] - 2D SS walk - initial and final positions the same
+[2023-08-22T22:16:04+0200.0672][INFO ][<ipython-input-1-0de80fca3aa4>] - No contact order enforced, No body configuration enforced
+[2023-08-22T22:16:04+0200.0673][INFO ][<ipython-input-1-0de80fca3aa4>] - Slip and friction implemented as slack variables
+[2023-08-22T22:16:04+0200.0675][INFO ][<ipython-input-1-0de80fca3aa4>] - Cost func = return sum(((m.tau_h1[n]**2+m.tau_k1[n]**2+m.tau_h2[n]**2+m.tau_k2[n]**2+m.tau_h3[n]**2+m.tau_k3[n]**2+m.tau_h4[n]**2+m.tau_k4[n]**2)*m.h[n]) for n in range(1,N+1))/m.q0[N,'x']
+[2023-08-22T22:16:04+0200.0676][INFO ][<ipython-input-1-0de80fca3aa4>] - Final eps value = 0.0001
+[2023-08-22T22:16:04+0200.0679][INFO ][<ipython-input-1-0de80fca3aa4>] - m.vel = 0.1 m/s, m.distance = 0.05 m
+[2023-08-22T22:16:04+0200.0680][INFO ][<ipython-input-1-0de80fca3aa4>] - Nodes = 40, time variable 0.3-0.01
+[2023-08-22T22:16:04+0200.0682][INFO ][<ipython-input-1-0de80fca3aa4>] - Fixed knee constraints and added hip constraints
+[2023-08-22T22:16:04+0200.0684][INFO ][<ipython-input-1-0de80fca3aa4>] - -------------------------------------------------------
+[2023-08-22T22:19:25+0200.0956][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 1000.0
+[2023-08-22T22:19:35+0200.0236][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 100.0
+[2023-08-22T22:20:36+0200.0275][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 10.0
+[2023-08-23T10:38:35+0200.0476][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 1.0
+[2023-08-23T10:40:30+0200.0336][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 0.1
+[2023-08-23T10:41:19+0200.0360][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 0.01
+[2023-08-23T10:42:40+0200.0680][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 0.001
+[2023-08-23T10:47:45+0200.0950][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 0.0001
+[2023-08-23T10:50:44+0200.0599][INFO ][<ipython-input-31-598ac6f1f495>] - Trajectory Optimisation Completed
+[2023-08-23T10:50:44+0200.0599][INFO ][<ipython-input-31-598ac6f1f495>] - Distance travelled: 0.15220677429961169 m
+[2023-08-23T10:50:44+0200.0599][INFO ][<ipython-input-31-598ac6f1f495>] - Gait Duration: 1.5207830500028736 s
+[2023-08-23T10:50:44+0200.0599][INFO ][<ipython-input-31-598ac6f1f495>] - velocity (dist/time): 0.10000000000000003
+[2023-08-23T10:50:44+0200.0599][INFO ][<ipython-input-31-598ac6f1f495>] - Final velocity: 0.002094548776804278
+[2023-08-23T10:50:44+0200.0614][INFO ][<ipython-input-31-598ac6f1f495>] - average x velocity: 0.07153779860575984
+[2023-08-23T10:50:44+0200.0614][INFO ][<ipython-input-31-598ac6f1f495>] - minimum x velocity: -0.00624482753805295
+[2023-08-23T10:50:44+0200.0614][INFO ][<ipython-input-31-598ac6f1f495>] - maximum x velocity: 0.3586584588853803
+[2023-08-23T10:50:44+0200.0614][INFO ][<ipython-input-31-598ac6f1f495>] - -------------------------------------------------------

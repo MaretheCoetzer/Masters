@@ -1,0 +1,19 @@
+[2023-08-23T14:35:35+0200.0703][INFO ][<ipython-input-1-aede5669396f>] - -------------------------------------------------------
+[2023-08-23T14:35:35+0200.0719][INFO ][<ipython-input-1-aede5669396f>] - Gait name: TwoD_SS_64
+[2023-08-23T14:35:35+0200.0720][INFO ][<ipython-input-1-aede5669396f>] - 2D SS walk - initial and final positions the same
+[2023-08-23T14:35:35+0200.0721][INFO ][<ipython-input-1-aede5669396f>] - No contact order enforced, No body configuration enforced
+[2023-08-23T14:35:35+0200.0724][INFO ][<ipython-input-1-aede5669396f>] - Slip and friction implemented as slack variables
+[2023-08-23T14:35:35+0200.0726][INFO ][<ipython-input-1-aede5669396f>] - Cost func = return sum(((m.tau_h1[n]**2+m.tau_k1[n]**2+m.tau_h2[n]**2+m.tau_k2[n]**2+m.tau_h3[n]**2+m.tau_k3[n]**2+m.tau_h4[n]**2+m.tau_k4[n]**2)*m.h[n]) for n in range(1,N+1))/m.q0[N,'x']
+[2023-08-23T14:35:35+0200.0727][INFO ][<ipython-input-1-aede5669396f>] - Final eps value = 0.0001
+[2023-08-23T14:35:35+0200.0728][INFO ][<ipython-input-1-aede5669396f>] - m.vel = 0.05 m/s, m.distance = 0.05 m
+[2023-08-23T14:35:35+0200.0730][INFO ][<ipython-input-1-aede5669396f>] - Nodes = 40, time variable 0.3-0.01
+[2023-08-23T14:35:35+0200.0732][INFO ][<ipython-input-1-aede5669396f>] - >< leg configuration, minimum bend in legs
+[2023-08-23T14:35:35+0200.0733][INFO ][<ipython-input-1-aede5669396f>] - -------------------------------------------------------
+[2023-08-23T14:36:28+0200.0130][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 1000.0
+[2023-08-23T14:37:43+0200.0196][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 100.0
+[2023-08-23T14:38:13+0200.0692][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 10.0
+[2023-08-23T14:38:55+0200.0520][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 1.0
+[2023-08-23T14:39:21+0200.0512][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 0.1
+[2023-08-23T14:40:00+0200.0312][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 0.01
+[2023-08-23T14:48:00+0200.0305][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 0.001
+[2023-08-23T14:59:29+0200.0201][INFO ][<ipython-input-27-bbbc76687ed3>] - eps: 0.0001
