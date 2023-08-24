@@ -30,7 +30,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as ani
 from IPython.display import HTML
 
-trajectory_name = 'TwoD_SS_53'
+trajectory_name = 'TwoD_SS_71'
 base_path = '/Users/Marethe/Documents/GitHub/Masters/2D_Quad_SS_Walk/'
 
 # load arrays
@@ -151,6 +151,7 @@ print(f"hip[0]: {th_by[0]}, t[0]: {t[0]}, hip[N]: {th_by[len(th_by)-1]}, t[N]: {
 # axs[0].plot(Torque_k4)
 # axs[0].set_title("Torques")
 # axs[0].legend(["Torque_h1", "Torque_k1","Torque_h2", "Torque_k2","Torque_h3", "Torque_k3","Torque_h4", "Torque_k4"],loc='upper right')
+
 
 # _____________________________________________Quad Plotting Function________________________________________
 def plot_robot(i,ax): #update function for animation
@@ -280,8 +281,8 @@ fig1, ax1 = plt.subplots(1,1) #create axes
 #ax1.set_aspect('equal')       
 update = lambda i: plot_robot(i,ax1) #lambdify update function
 
-animate = ani.FuncAnimation(fig1,update,range(1,N+1),interval = 50,repeat=False)
-# animate.save(r"C:"+base_path+trajectory_name+".gif", writer='PillowWriter', fps=10)
+animate = ani.FuncAnimation(fig1,update,range(0,len(SS_H1)),interval = 50,repeat=False)
+animate.save(r"C:"+base_path+"../image_sorting/"+trajectory_name+".gif", writer='PillowWriter', fps=10)
 HTML(animate.to_jshtml())
 
 # _____________________________________Stills of linearised gaits________________________________________________
@@ -292,7 +293,7 @@ fig2, ax2 = plt.subplots(1,1)
 for i in np.linspace(0,len(SS_H1)-1,still_nr):
     plot_robot(int(i),ax2)
     plt.title({int(i)})
-    plt.savefig(r"C:"+base_path+"../image_sorting/"+trajectory_name+"_"+str(int(i))+".png", transparent=True, bbox_inches='tight') #bbox_inches is used to remove excess white around figure
+    # plt.savefig(r"C:"+base_path+"../image_sorting/"+trajectory_name+"_"+str(int(i))+".png", transparent=True, bbox_inches='tight') #bbox_inches is used to remove excess white around figure
 
 fig3, ax3 = plt.subplots(1,1)    
 sequence = np.array([0,12,20,48,56,64,76])
@@ -301,6 +302,6 @@ print(len(sequence))
 print(len(step))
 plot_robot_sequence(sequence,ax3,1,step)
 
-plt.savefig(r"C:"+base_path+"../image_sorting/"+trajectory_name+"_cascade.png", transparent=True, bbox_inches='tight') #bbox_inches is used to remove excess white around figure
+# plt.savefig(r"C:"+base_path+"../image_sorting/"+trajectory_name+"_cascade.png", transparent=True, bbox_inches='tight') #bbox_inches is used to remove excess white around figure
 
 
