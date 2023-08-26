@@ -30,13 +30,13 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as ani
 from IPython.display import HTML
 
-trajectory_name = 'TwoD_SS_71'
+trajectory_name = '12'
 base_path = '/Users/Marethe/Documents/GitHub/Masters/2D_Quad_SS_Walk/'
-
+other = '/Users/Marethe/OneDrive/Masters_2.0/Quad_simulations/2D/Quad_gaits/'
 # load arrays
-Properties = pd.read_csv(r'C:'+base_path+trajectory_name+'_Properties.csv')
-Torque = pd.read_csv(r'C:'+base_path+trajectory_name+'_Torque.csv')
-Movement = pd.read_csv(r'C:'+base_path+trajectory_name+'_col_ros.csv')
+Properties = pd.read_csv(r'C:'+other+trajectory_name+'_Properties.csv')
+Torque = pd.read_csv(r'C:'+other+trajectory_name+'_Nodal.csv')
+Movement = pd.read_csv(r'C:'+other+trajectory_name+'_col_ros.csv')
 
 # Assigning values
 step=0.01 #s
@@ -129,13 +129,13 @@ def Interpolater(joint,t,step):
 # plt.legend(['Linearised data','Trajectory data'])
 # plt.show()
 
-print(f'Interpolated Joint size: {len(SS_BY)}, Interpolated t size: {len(ss_t)}')
-print(f"hip[0]: {SS_BY[0]}, t[0]: {ss_t[0]}, hip[N]: {SS_BY[len(SS_BY)-1]}, t[N]: {ss_t[len(SS_BY)-1]}")
-print(f'Original Joint size: {len(th_by)}, Original t size: {len(t)}')
-print(f"hip[0]: {th_by[0]}, t[0]: {t[0]}, hip[N]: {th_by[len(th_by)-1]}, t[N]: {t[len(th_by)-1]}\n")
+print(f'Interpolated Joint size: {len(SS_H1)}, Interpolated t size: {len(ss_t)}')
+print(f"hip[0]: {SS_H1[0]}, t[0]: {ss_t[0]}, hip[N]: {SS_H1[len(SS_H1)-1]}, t[N]: {ss_t[len(SS_H1)-1]}")
+print(f'Original Joint size: {len(th_h1)}, Original t size: {len(t)}')
+print(f"hip[0]: {th_h1[0]}, t[0]: {t[0]}, hip[N]: {th_h1[len(th_h1)-1]}, t[N]: {t[len(th_h1)-1]}\n")
 
-# np.set_string_function(lambda x: repr(x).replace('(', '').replace(')', '').replace('array', '').replace("       ", ' ').replace('[','{').replace(']','}').replace('\n','') , repr=False)
-# print(f'float SS_servo0[] = {SS_H1};\nfloat SS_servo1[] = {SS_K1};\nfloat SS_servo2[] = {SS_H2};\nfloat SS_servo3[] = {SS_K2};\nfloat SS_servo4[] = {SS_H3};\nfloat SS_servo5[] = {SS_K3};\nfloat SS_servo6[] = {SS_H4};\nfloat SS_servo7[] = {SS_K4};')
+np.set_string_function(lambda x: repr(x).replace('(', '').replace(')', '').replace('array', '').replace("       ", ' ').replace('[','{').replace(']','}').replace('\n','') , repr=False)
+print(f'float SS_servo0[] = {SS_H1};\nfloat SS_servo1[] = {SS_K1};\nfloat SS_servo2[] = {SS_H2};\nfloat SS_servo3[] = {SS_K2};\nfloat SS_servo4[] = {SS_H3};\nfloat SS_servo5[] = {SS_K3};\nfloat SS_servo6[] = {SS_H4};\nfloat SS_servo7[] = {SS_K4};')
 
 
 # ________________________________________Torque Plots________________________________________
