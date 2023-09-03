@@ -1,0 +1,28 @@
+{
+  "result_name": "3D_hind_leg_step_up",
+  "run_description": "3D_hind_step_up, body theta_y angle constrained to be smaller than 5 deg, hoping it'll put more force on the front legs, forced theta_z to 0",
+  "log_level": "INFO",
+
+  "num_nodes": 40,
+  "iterations": 6,
+  "refine": "3D_hind_leg_step_up.7d3b136f-8e44-45cd-9fcb-2a62d2da7e05",
+  "dimensionality": "THREE_D",
+
+  "movement_action": "step-up-hind",
+  "clearance_z": 0.015,   
+  "travel_distance": 0.07,
+
+  "stair_climbing_params":{
+    "stair_height": 0.03,
+    "step_length": 0.05,
+    "distance_from_step": 0.04,
+    "clearance_x": 0.03
+  },
+  
+  "ipopt_params": {
+    "print_level": 5,
+    "max_iter": 100000,
+    "max_cpu_time": 120000,
+    "tolerance": 0.000001
+  }
+}

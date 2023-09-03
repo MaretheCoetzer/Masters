@@ -1,0 +1,27 @@
+{
+  "result_name": "SS_walk",
+  "run_description": "Testing run-config script",
+  "log_level": "INFO",
+
+  "num_nodes": 40,
+  "iterations": 5,
+  "refine": "no",
+
+  "movement_action": "walk",
+  "clearance_z": 0.01,   
+  "travel_distance": 0.05,
+
+  "stair_climbing_params":{
+    "stair_height": 0.0,
+    "step_length": 0.0,
+    "distance_from_step": 0.0,
+    "clearance_x": 0.0
+  },
+  
+  "ipopt_params": {
+    "print_level": 5,
+    "max_iter": 100000,
+    "max_cpu_time": 120000,
+    "tolerance": 0.000001
+  }
+}

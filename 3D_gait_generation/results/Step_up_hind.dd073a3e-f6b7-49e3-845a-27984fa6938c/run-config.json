@@ -1,0 +1,28 @@
+{
+  "result_name": "Step_up_hind",
+  "run_description": "Step-up-hind-legs, eps=5, stair_height=3cm, step length decreased, height constraint removed, clearance decreased, front feet NOW stationary, forced step apex to be 2cm before max foot step up dist",
+  "log_level": "INFO",
+
+  "num_nodes": 40,
+  "iterations": 5,
+  "refine": "no",
+  "dimensionality": "THREE_D",
+
+  "movement_action": "step-up-hind",
+  "clearance_z": 0.02,   
+  "travel_distance": 0.06,
+
+  "stair_climbing_params":{
+    "stair_height": 0.03,
+    "step_length": 0.04,
+    "distance_from_step": 0.04,
+    "clearance_x": 0.04
+  },
+  
+  "ipopt_params": {
+    "print_level": 5,
+    "max_iter": 100000,
+    "max_cpu_time": 120000,
+    "tolerance": 0.000001
+  }
+}

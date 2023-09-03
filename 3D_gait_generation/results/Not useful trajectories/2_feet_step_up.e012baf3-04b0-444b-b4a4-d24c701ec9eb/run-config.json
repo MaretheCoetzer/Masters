@@ -1,0 +1,17 @@
+{
+  "result_name": "2_feet_step_up",
+  "run_description": "Coriolis run",
+  "log_level": "INFO",
+
+  "stair_height": 0.1,
+  "step_length": 0.2,
+  "distance_from_step": 0.3,
+  "num_nodes": 40,
+
+  "ipopt_params": {
+    "print_level": 5,
+    "max_iter": 100000,
+    "max_cpu_time": 120000,
+    "tolerance": 0.000001
+  }
+}

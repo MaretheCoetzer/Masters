@@ -1,0 +1,28 @@
+{
+  "result_name": "2D_SS_walk",
+  "run_description": "2D SS walk, with friction cone and slip and c matrix included, torque cost function",
+  "log_level": "INFO",
+
+  "num_nodes": 40,
+  "iterations": 5,
+  "refine": "2D_SS_walk.eff2d7a7-fe0b-4b16-a38a-97c18e4326d9",
+  "dimensionality": "TWO_D",
+
+  "movement_action": "walk",
+  "clearance_z": 0.015,   
+  "travel_distance": 0.04,
+
+  "stair_climbing_params":{
+    "stair_height": 0.03,
+    "step_length": 0.05,
+    "distance_from_step": 0.04,
+    "clearance_x": 0.03
+  },
+  
+  "ipopt_params": {
+    "print_level": 5,
+    "max_iter": 100000,
+    "max_cpu_time": 120000,
+    "tolerance": 0.000001
+  }
+}

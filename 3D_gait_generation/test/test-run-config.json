@@ -1,0 +1,30 @@
+{
+    "result_name": "2_feet_step_up",
+    "run_description": "Testing run-config script",
+    "log_level": "INFO",
+  
+    "num_nodes": 40,
+    "iterations": 2,
+    "eps": 1000.00,
+    "refine": "no",
+    "dimensionality": "TWO_D",
+  
+    "movement_action": "walk",
+    "clearance_z": 0.01,   
+    "travel_distance": 0.07,
+  
+    "stair_climbing_params":{
+      "stair_height": 0.3,
+      "step_length": 0.2,
+      "distance_from_step": 0.1,
+      "clearance_x": 0.0
+    },
+    
+    "ipopt_params": {
+      "print_level": 5,
+      "max_iter": 100000,
+      "max_cpu_time": 120000,
+      "tolerance": 0.000001
+    }
+  }
+  

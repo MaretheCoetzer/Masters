@@ -1,0 +1,28 @@
+{
+  "result_name": "3D_hind_leg_step_up",
+  "run_description": "3D hind leg step up, no c matrix included, forced front feet GRF to be greater, foot 1 and 2 step height also removed",
+  "log_level": "INFO",
+
+  "num_nodes": 40,
+  "iterations": 6,
+  "refine": "Step_up_hind.056af6a8-fc82-4f2b-91d9-86567ff5ee8b",
+  "dimensionality": "THREE_D",
+
+  "movement_action": "step-up-hind",
+  "clearance_z": 0.015,   
+  "travel_distance": 0.04,
+
+  "stair_climbing_params":{
+    "stair_height": 0.03,
+    "step_length": 0.05,
+    "distance_from_step": 0.04,
+    "clearance_x": 0.03
+  },
+  
+  "ipopt_params": {
+    "print_level": 5,
+    "max_iter": 100000,
+    "max_cpu_time": 120000,
+    "tolerance": 0.000001
+  }
+}

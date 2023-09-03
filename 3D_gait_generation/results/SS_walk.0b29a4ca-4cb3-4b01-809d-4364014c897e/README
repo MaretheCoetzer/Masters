@@ -1,0 +1,15 @@
+SS walk 2D
+	"iterations": 5,
+ 	"dimensionality": "TWO_D",
+  	"movement_action": "walk",
+  	"clearance_z": 0.01,   
+  	"travel_distance": 0.07,
+
+Robot implementation
+	gait execution: Looks good
+	Feet: bare threaded rod
+	surface: wooden planks
+	observation: Adding battery weight the robot feet slips a bit more, but can still perform the walk 
+			- battery weigth = 489 g (with 6 batteries)
+			
+		

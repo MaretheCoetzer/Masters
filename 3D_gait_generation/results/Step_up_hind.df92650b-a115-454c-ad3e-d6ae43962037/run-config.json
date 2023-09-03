@@ -1,0 +1,28 @@
+{
+  "result_name": "Step_up_hind",
+  "run_description": "Step-up-hind-legs, eps=5, stair_height=3cm, step length removed in step-up.py",
+  "log_level": "INFO",
+
+  "num_nodes": 40,
+  "iterations": 5,
+  "refine": "no",
+  "dimensionality": "THREE_D",
+
+  "movement_action": "step-up-hind",
+  "clearance_z": 0.01,   
+  "travel_distance": 0.04,
+
+  "stair_climbing_params":{
+    "stair_height": 0.03,
+    "step_length": 0.05,
+    "distance_from_step": 0.0,
+    "clearance_x": 0.05
+  },
+  
+  "ipopt_params": {
+    "print_level": 5,
+    "max_iter": 100000,
+    "max_cpu_time": 120000,
+    "tolerance": 0.000001
+  }
+}
