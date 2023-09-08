@@ -49,10 +49,15 @@ def get_limb_length_m(n, lb, ln):
     elif lb == 'body':
         return constants.BodyLength
     elif lb == 'bodyWidth':
-        return constants.get_body_width(__run_config.dimension.value)
+        return constants.BodyWidth
     elif lb == 'legRadius':
-        return constants.get_leg_radius(__run_config.dimension._value_)
+        return constants.LegRadius
     else: return constants.TibiaLength
+
+def calculate_limb_inertia_nm(m, lb, ln): 
+    l = (lb,ln)
+    # yes, that does mean you have to rebuild the tuple inside the function. Yes, it is dumb.
+    return m.m[l]*m.l[l]**2/12 
 
 # ------------------------------------------------------------------------------------------
 # COST CONSTRAINT FUNCTIONS and other goodies
@@ -416,17 +421,6 @@ def finalthk4(m,n):
     else:
         return Constraint.Skip
 
-    # 2D-ifying 
-def twoD_y(m,n,c):
-    return m.q[n,c,'y'] == 0.0
-
-def twoD_thbx(m,n,c):
-    return m.q[n,c,'theta_bx'] == 0.0
-
-def twoD_thbz(m,n,c):
-    return m.q[n,c,'theta_bz'] == 0.0
-# SLIP AND GRF FOR 2D is set up as 2D
-
 def total_cost_function(m):
    return sum(m.h[n] for n in range(1,__run_config.num_nodes+1))/m.q0[__run_config.num_nodes,'x']
     # return sum(((m.tau_h1[n]**2+m.tau_k1[n]**2+m.tau_h2[n]**2+m.tau_k2[n]**2+m.tau_h3[n]**2+m.tau_k3[n]**2+m.tau_h4[n]**2+m.tau_k4[n]**2)*m.h[n]) for n in range(1,__run_config.num_nodes+1))/m.q0[n,'x'] #Minimum total actuator force and torque
@@ -547,51 +541,6 @@ def contact_4_pr(m,n):
 
 # ------------------------------------------------------------------------------------------
 # FRICTION CONSTRAINTS
-# ____________________2D STUFF____________________________
-# Leg 1 
-def a_friction_1(m,n,c):   
-    return m.a_friction_1[n,c] == m.mu*m.GRF1[n,c,'Z','ps'] - (m.GRF1[n,c,'X','ps'] + m.GRF1[n,c,'X','ng'])
-def b_friction_1(m,n,c):   
-    return m.b_friction_1[n,c] == m.gamma_1[n,c]
-#condition
-def friction_1_2D(m,n):
-    a_friction_1_pr = m.a_friction_1[n,1] + m.a_friction_1[n,2] + m.a_friction_1[n,3] 
-    b_friction_1_pr = m.b_friction_1[n,1] + m.b_friction_1[n,2] + m.b_friction_1[n,3]  
-    return a_friction_1_pr*b_friction_1_pr <= m.eps
-
-# Leg 2 
-def a_friction_2(m,n,c):   
-    return m.a_friction_2[n,c] == m.mu*m.GRF2[n,c,'Z','ps'] - (m.GRF2[n,c,'X','ps'] + m.GRF2[n,c,'X','ng'])
-def b_friction_2(m,n,c):   
-    return m.b_friction_2[n,c] == m.gamma_2[n,c]
-#condition
-def friction_2_2D(m,n):
-    a_friction_2_pr = m.a_friction_2[n,1] + m.a_friction_2[n,2] + m.a_friction_2[n,3] 
-    b_friction_2_pr = m.b_friction_2[n,1] + m.b_friction_2[n,2] + m.b_friction_2[n,3]  
-    return a_friction_2_pr*b_friction_2_pr <= m.eps
-
-# Leg 3 
-def a_friction_3(m,n,c):   
-    return m.a_friction_3[n,c] == m.mu*m.GRF3[n,c,'Z','ps'] - (m.GRF3[n,c,'X','ps'] + m.GRF3[n,c,'X','ng'])
-def b_friction_3(m,n,c):   
-    return m.b_friction_3[n,c] == m.gamma_3[n,c]
-#condition
-def friction_3_2D(m,n):
-    a_friction_3_pr = m.a_friction_3[n,1] + m.a_friction_3[n,2] + m.a_friction_3[n,3] 
-    b_friction_3_pr = m.b_friction_3[n,1] + m.b_friction_3[n,2] + m.b_friction_3[n,3]  
-    return a_friction_3_pr*b_friction_3_pr <= m.eps
-
-# Leg 4 
-def a_friction_4(m,n,c):   
-    return m.a_friction_4[n,c] == m.mu*m.GRF4[n,c,'Z','ps'] - (m.GRF4[n,c,'X','ps'] + m.GRF4[n,c,'X','ng'])
-def b_friction_4(m,n,c):   
-    return m.b_friction_4[n,c] == m.gamma_4[n,c]
-#condition
-def friction_4_2D(m,n):
-    a_friction_4_pr = m.a_friction_4[n,1] + m.a_friction_4[n,2] + m.a_friction_4[n,3] 
-    b_friction_4_pr = m.b_friction_4[n,1] + m.b_friction_4[n,2] + m.b_friction_4[n,3]  
-    return a_friction_4_pr*b_friction_4_pr <= m.eps
-
 # ____________________3D STUFF____________________________
 def friction_1_3D(m,n,c): 
     return (m.mu*m.GRF1[n,c,'Z','ps'])**2 >= ((m.GRF1[n,c,'X','ps'] + m.GRF1[n,c,'X','ng'])**2+(m.GRF1[n,c,'Y','ps'] + m.GRF1[n,c,'Y','ng'])**2)
@@ -1376,6 +1325,7 @@ def th_h4_constraint(m,n):
 
 # create the model
 m = ConcreteModel()
+m.clear()
 
 #-----Variables-------------
 #Node Points
@@ -1386,7 +1336,7 @@ m.Tmax = 6.864655 #Nm, corresponding to a 8V input                 #CALLEN chang
 m.Wmax = 8.055366 #rad/s, corresponding to a 8V input
 
 #Travel distance
-m.distance =__run_config.travel_distance# 0.07 #m
+m.distance =__run_config.travel_distance #m
 m.vel = 0.1 #m/s
 
 # ## Symbolic Equations
@@ -1608,7 +1558,7 @@ J4=foot4_pos.jacobian(q)
 GRF_4 = J4.transpose()*sym.Matrix([[GRF4x],[GRF4y],[GRF4z]])
 
 __logger.info("EOM calc")
-EOM=M*ddq+G-Q-GRF_1-GRF_2-GRF_3-GRF_4#+C*dq
+EOM=M*ddq+G-Q-GRF_1-GRF_2-GRF_3-GRF_4+C*dq
 
 EOMs = sym.zeros(len(q),1)
 EOMcounter = 0
@@ -1704,6 +1654,7 @@ __logger.debug(f'total body mass: {mbody}')
 __logger.debug(f'total body weight: {mBW}')
 
 m.l = Param(m.L, initialize = get_limb_length_m) 
+m.In = Param(m.L, initialize = calculate_limb_inertia_nm) # moment of inertia
 
 #Body inertia
 m.inbx = 1/12*m.m[('body',1)]*m.l[('body',1)]**2
@@ -1713,6 +1664,11 @@ m.infxy = m.m[('femur',1)]*m.l[('femur',1)]**2/12
 m.intxy = m.m[('tibia',1)]*m.l[('tibia',1)]**2/12
 m.infz = m.m[('femur',1)]*m.l[('legRadius',1)]**2/2
 m.intz = m.m[('tibia',1)]*m.l[('legRadius',1)]**2/2
+
+def calculate_limb_inertia_nm(m, lb, ln): 
+    l = (lb,ln)
+    # yes, that does mean you have to rebuild the tuple inside the function. Yes, it is dumb.
+    return m.m[l]*m.l[l]**2/12 
  
 __logger.info("Collocation constraints") 
 m.ContConstraint_p = Constraint(m.N, m.DOF, rule = cost_constraint_position)
@@ -1740,42 +1696,18 @@ m.mu = Param(initialize =1.00)
 __logger.info("Slack variables")
 m.a_contact_1  = Var(m.N, m.cN, bounds = (0.0,None)) 
 m.b_contact_1  = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.a_friction_1 = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.b_friction_1 = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.a_slip_p_1   = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.b_slip_p_1   = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.a_slip_n_1   = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.b_slip_n_1   = Var(m.N, m.cN, bounds = (0.0,None)) 
 m.gamma_1      = Var(m.N, m.cN, bounds = (0.0,None)) 
 
 m.a_contact_2  = Var(m.N, m.cN, bounds = (0.0,None)) 
 m.b_contact_2  = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.a_friction_2 = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.b_friction_2 = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.a_slip_p_2   = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.b_slip_p_2   = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.a_slip_n_2   = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.b_slip_n_2   = Var(m.N, m.cN, bounds = (0.0,None)) 
 m.gamma_2      = Var(m.N, m.cN, bounds = (0.0,None)) 
 
 m.a_contact_3  = Var(m.N, m.cN, bounds = (0.0,None)) 
 m.b_contact_3  = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.a_friction_3 = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.b_friction_3 = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.a_slip_p_3   = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.b_slip_p_3   = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.a_slip_n_3   = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.b_slip_n_3   = Var(m.N, m.cN, bounds = (0.0,None)) 
 m.gamma_3      = Var(m.N, m.cN, bounds = (0.0,None)) 
 
 m.a_contact_4  = Var(m.N, m.cN, bounds = (0.0,None)) 
 m.b_contact_4  = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.a_friction_4 = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.b_friction_4 = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.a_slip_p_4   = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.b_slip_p_4   = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.a_slip_n_4   = Var(m.N, m.cN, bounds = (0.0,None)) 
-m.b_slip_n_4   = Var(m.N, m.cN, bounds = (0.0,None)) 
 m.gamma_4      = Var(m.N, m.cN, bounds = (0.0,None)) 
 
 # define the vectors for the contact model
@@ -1834,8 +1766,8 @@ m.midXMin = Constraint(m.N, rule = midXMin)
 m.finalXMin = Constraint(m.N, rule = finalXMin)
 m.finalXMax = Constraint(m.N, rule = finalXMax)
 
-# m.step_height_1 = Constraint(m.N, m.cN, rule = step_height_1)
-# m.step_height_2 = Constraint(m.N, m.cN, rule = step_height_2)
+m.step_height_1 = Constraint(m.N, m.cN, rule = step_height_1)
+m.step_height_2 = Constraint(m.N, m.cN, rule = step_height_2)
 m.step_height_3 = Constraint(m.N, m.cN, rule = step_height_3)
 m.step_height_4 = Constraint(m.N, m.cN, rule = step_height_4)
 
@@ -1869,67 +1801,20 @@ m.def_contact_4_pr = Constraint(m.N, rule = contact_4_pr)
 
 __logger.info("Friction cone")
 # FRICTION CONE
-if __run_config.dimension.name == 'TWO_D':
-    # The friction cone in all its glory
-    m.def_a_friction_1 = Constraint(m.N, m.cN, rule = a_friction_1)
-    m.def_a_friction_2 = Constraint(m.N, m.cN, rule = a_friction_2)
-    m.def_a_friction_3 = Constraint(m.N, m.cN, rule = a_friction_3)
-    m.def_a_friction_4 = Constraint(m.N, m.cN, rule = a_friction_4)
-    m.def_b_friction_1 = Constraint(m.N, m.cN, rule = b_friction_1)
-    m.def_b_friction_2 = Constraint(m.N, m.cN, rule = b_friction_2)
-    m.def_b_friction_3 = Constraint(m.N, m.cN, rule = b_friction_3)
-    m.def_b_friction_4 = Constraint(m.N, m.cN, rule = b_friction_4)
-    m.def_friction_1 = Constraint(m.N, rule = friction_1_2D)
-    m.def_friction_2 = Constraint(m.N, rule = friction_2_2D)
-    m.def_friction_3 = Constraint(m.N, rule = friction_3_2D)
-    m.def_friction_4 = Constraint(m.N, rule = friction_4_2D)
-    # Slip in all its glory:
-    m.def_a_slip_p_1 = Constraint(m.N, m.cN, rule = def_a_slip_p_1)
-    m.def_b_slip_p_1 = Constraint(m.N, m.cN, rule = def_b_slip_p_1)
-    m.def_slip_p_1_pr = Constraint(m.N, rule = def_slip_p_1_pr)
-    m.def_a_slip_n_1 = Constraint(m.N, m.cN, rule = def_a_slip_n_1)
-    m.def_b_slip_n_1 = Constraint(m.N, m.cN, rule = def_b_slip_n_1)
-    m.def_slip_n_1_pr = Constraint(m.N, rule = def_slip_n_1_pr)
-    m.def_a_slip_p_2 = Constraint(m.N, m.cN, rule = def_a_slip_p_2)
-    m.def_b_slip_p_2 = Constraint(m.N, m.cN, rule = def_b_slip_p_2)
-    m.def_slip_p_2_pr = Constraint(m.N, rule = def_slip_p_2_pr)
-    m.def_a_slip_n_2 = Constraint(m.N, m.cN, rule = def_a_slip_n_2)
-    m.def_b_slip_n_2 = Constraint(m.N, m.cN, rule = def_b_slip_n_2)
-    m.def_slip_n_2_pr = Constraint(m.N, rule = def_slip_n_2_pr)
-    m.def_a_slip_p_3 = Constraint(m.N, m.cN, rule = def_a_slip_p_3)
-    m.def_b_slip_p_3 = Constraint(m.N, m.cN, rule = def_b_slip_p_3)
-    m.def_slip_p_3_pr = Constraint(m.N, rule = def_slip_p_3_pr)
-    m.def_a_slip_n_3 = Constraint(m.N, m.cN, rule = def_a_slip_n_3)
-    m.def_b_slip_n_3 = Constraint(m.N, m.cN, rule = def_b_slip_n_3)
-    m.def_slip_n_3_pr = Constraint(m.N, rule = def_slip_n_3_pr)
-    m.def_a_slip_p_4 = Constraint(m.N, m.cN, rule = def_a_slip_p_4)
-    m.def_b_slip_p_4 = Constraint(m.N, m.cN, rule = def_b_slip_p_4)
-    m.def_slip_p_4_pr = Constraint(m.N, rule = def_slip_p_4_pr)
-    m.def_a_slip_n_4 = Constraint(m.N, m.cN, rule = def_a_slip_n_4)
-    m.def_b_slip_n_4 = Constraint(m.N, m.cN, rule = def_b_slip_n_4)
-    m.def_slip_n_4_pr = Constraint(m.N, rule = def_slip_n_4_pr)
-    # restrict movement in y direction:
-    m.twoD_y = Constraint(m.N, m.cN, rule = twoD_y)
-    m.twoD_thbx = Constraint(m.N, m.cN, rule = twoD_thbx)
-    m.twoD_thbz = Constraint(m.N, m.cN, rule = twoD_thbz)
-
-if __run_config.dimension.name == 'THREE_D':
-    # Simplified friction cone
-    m.def_friction_1 = Constraint(m.N, m.cN, rule = friction_1_3D)
-    m.def_friction_2 = Constraint(m.N, m.cN, rule = friction_2_3D)
-    m.def_friction_3 = Constraint(m.N, m.cN, rule = friction_3_3D)
-    m.def_friction_4 = Constraint(m.N, m.cN, rule = friction_4_3D)
-    # Ground reaction forces - prevents slip
-    m.def_F1_x = Constraint(m.N, m.cN, rule = ground_force_f1_x)
-    m.def_F1_y = Constraint(m.N, m.cN, rule = ground_force_f1_y)
-    m.def_F2_x = Constraint(m.N, m.cN, rule = ground_force_f2_x)
-    m.def_F2_y = Constraint(m.N, m.cN, rule = ground_force_f2_y)
-    m.def_F3_x = Constraint(m.N, m.cN, rule = ground_force_f3_x)
-    m.def_F3_y = Constraint(m.N, m.cN, rule = ground_force_f3_y)
-    m.def_F4_x = Constraint(m.N, m.cN, rule = ground_force_f4_x)
-    m.def_F4_y = Constraint(m.N, m.cN, rule = ground_force_f4_y)    
-
-
+# Simplified friction cone
+m.def_friction_1 = Constraint(m.N, m.cN, rule = friction_1_3D)
+m.def_friction_2 = Constraint(m.N, m.cN, rule = friction_2_3D)
+m.def_friction_3 = Constraint(m.N, m.cN, rule = friction_3_3D)
+m.def_friction_4 = Constraint(m.N, m.cN, rule = friction_4_3D)
+# Ground reaction forces - prevents slip
+m.def_F1_x = Constraint(m.N, m.cN, rule = ground_force_f1_x)
+m.def_F1_y = Constraint(m.N, m.cN, rule = ground_force_f1_y)
+m.def_F2_x = Constraint(m.N, m.cN, rule = ground_force_f2_x)
+m.def_F2_y = Constraint(m.N, m.cN, rule = ground_force_f2_y)
+m.def_F3_x = Constraint(m.N, m.cN, rule = ground_force_f3_x)
+m.def_F3_y = Constraint(m.N, m.cN, rule = ground_force_f3_y)
+m.def_F4_x = Constraint(m.N, m.cN, rule = ground_force_f4_x)
+m.def_F4_y = Constraint(m.N, m.cN, rule = ground_force_f4_y)    
 
 __logger.info("Torque bounds")
 m.tau_h1 = Var(m.N, bounds = (-m.Tmax,m.Tmax)) # actuator torque at hip_1
@@ -2334,6 +2219,9 @@ __logger.info("Generating result animations")
 script_opts = Trajectory_reader.ScriptOptions(silent=True, result_name=__run_config.get_full_result_name())
 Trajectory_reader.gen_trajectories(script_opts)
 
+duration=m.tt0[__run_config.num_nodes].value-m.tt0[1].value
+__logger.info(f"Final distance travelled: {m.q0[__run_config.num_nodes,'x'].value}")
+__logger.info(f"Total travel time: {duration}")
 __logger.info("Finito")
 
 # ---------------------------------------------------
