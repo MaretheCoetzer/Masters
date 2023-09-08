@@ -29,19 +29,66 @@ from numpy import asarray
 import matplotlib.pyplot as plt
 import matplotlib.animation as ani
 from IPython.display import HTML
+import os
+
+# Custom modules
+import log
+__logger = log.setup_custom_logger("2D_data_processing")
 
 trajectory_name = '12'
-base_path = '/Users/Marethe/Documents/GitHub/Masters/2D_Quad_SS_Walk/'
-other = '/Users/Marethe/OneDrive/Masters_2.0/Quad_simulations/2D/Quad_gaits/'
-# load arrays
-Properties = pd.read_csv(r'C:'+other+trajectory_name+'_Properties.csv')
-Torque = pd.read_csv(r'C:'+other+trajectory_name+'_Nodal.csv')
-Movement = pd.read_csv(r'C:'+other+trajectory_name+'_col_ros.csv')
 
 # Assigning values
 step=0.01 #s
 
+
+# _________________________________Helper functions____________________________
+def _get_result_dir(result_name):
+    """
+    Check if the result directory exists, throwing an exception if not. We expect
+    this directory to have been created by step-up.py and from there we just read
+    in the results and write out our animations.
+    """
+    script_path = __file__
+    parent_dir = os.path.split(os.path.dirname(script_path))[0]
+    __logger.info(f"Found parent dir={parent_dir}")
+
+    # If we do not have the results directory bail out
+    results_path = "{}/results/{}/".format(parent_dir, result_name)
+    if not os.path.exists(results_path):
+        __logger.error(f"Could not find result path {results_path} - exiting")
+        raise Exception("Could not find results directory")
+
+    __logger.info(f"Set results path to {results_path}")
+    return results_path
+
+def _load_results(result_dir):
+    """
+    Loads the results from a given result directory, returns an array of the
+    CSV object
+    """
+    __logger.info(f"Loading results from {result_dir}")
+    Properties =  _load_single_result(result_dir + "3D_Properties.csv")
+    Movement =  _load_single_result(result_dir + "3D_col_ros.csv")
+    Torque =  _load_single_result(result_dir + "3D_Nodal.csv")
+    Ros =  _load_single_result(result_dir + "3D_col_traj.csv")
+    return [Properties, Movement, Torque, Ros]
+
+
+def _load_single_result(result_file_path):
+    """
+    Given a full path to a result .csv file loads it using pandas, first
+    checking for its existence
+    """
+    if not os.path.exists(result_file_path):
+        __logger.error(f"Could not find result file {result_file_path}")
+        raise Exception("Result file not found")
+    
+    return pd.read_csv(result_file_path)
+
 # ___________________________________Loading Values_______________________________________________
+path=_get_result_dir(trajectory_name)
+[Properties,Movement,Torque,Ros]=_load_results(path)
+
 N = Properties.iloc[0,0]
 
 x = Movement.iloc[:,0]
@@ -282,7 +329,7 @@ fig1, ax1 = plt.subplots(1,1) #create axes
 update = lambda i: plot_robot(i,ax1) #lambdify update function
 
 animate = ani.FuncAnimation(fig1,update,range(0,len(SS_H1)),interval = 50,repeat=False)
-animate.save(r"C:"+base_path+"../image_sorting/"+trajectory_name+".gif", writer='PillowWriter', fps=10)
+animate.save(path+"..\..\..\post_processing\image_sorting\\"+trajectory_name+".gif", writer='PillowWriter', fps=10)
 HTML(animate.to_jshtml())
 
 # _____________________________________Stills of linearised gaits________________________________________________
@@ -293,7 +340,7 @@ fig2, ax2 = plt.subplots(1,1)
 for i in np.linspace(0,len(SS_H1)-1,still_nr):
     plot_robot(int(i),ax2)
     plt.title({int(i)})
-    # plt.savefig(r"C:"+base_path+"../image_sorting/"+trajectory_name+"_"+str(int(i))+".png", transparent=True, bbox_inches='tight') #bbox_inches is used to remove excess white around figure
+    # plt.savefig(path+"..\..\..\post_processing\image_sorting\\"+trajectory_name+"_"+str(int(i))+".png", transparent=True, bbox_inches='tight') #bbox_inches is used to remove excess white around figure
 
 fig3, ax3 = plt.subplots(1,1)    
 sequence = np.array([0,12,20,48,56,64,76])
@@ -301,7 +348,8 @@ step = range(0,len(sequence))
 print(len(sequence))
 print(len(step))
 plot_robot_sequence(sequence,ax3,1,step)
+# in hind sight not sure how this one works with step being inputted as an array independent of sequence, if it stops working consult 3D linearisation.
 
-# plt.savefig(r"C:"+base_path+"../image_sorting/"+trajectory_name+"_cascade.png", transparent=True, bbox_inches='tight') #bbox_inches is used to remove excess white around figure
+# plt.savefig(path+"..\..\..\post_processing\image_sorting\\"+trajectory_name+"_cascade.png", transparent=True, bbox_inches='tight',dpi=500) #bbox_inches is used to remove excess white around figure, dpi(dots per inch) image quality
 
 
