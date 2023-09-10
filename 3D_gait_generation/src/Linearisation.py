@@ -36,7 +36,7 @@ import os
 import log
 __logger = log.setup_custom_logger("3D_data_processing")
 
-trajectory_name = 'SS_walk_0cm_z_clearance'
+trajectory_name = 'Step_up_hind.313f4674-fc37-4ce9-b1b4-459388a54b79'
 # Assigning values
 step=0.01 #s
 
@@ -243,19 +243,19 @@ def TwoD_plot_robot(i,ax):
     ax.plot([h4[0,0],k4[0,0]],[h4[2,0],k4[2,0]],color='xkcd:purple')
 
     #Plot Tibia 1
-    ax.plot([k1[0,0],foot1[0,0]],[k1[2,0],foot1[2,0]],color='xkcd:black')
+    ax.plot([k1[0,0],foot1[0,0]],[k1[2,0],foot1[2,0]],color='xkcd:blue')
 
     #Plot Tibia 2
-    ax.plot([k2[0,0],foot2[0,0]],[k2[2,0],foot2[2,0]],color='xkcd:black')
+    ax.plot([k2[0,0],foot2[0,0]],[k2[2,0],foot2[2,0]],color='xkcd:green')
 
     #Plot Tibia 3
-    ax.plot([k3[0,0],foot3[0,0]],[k3[2,0],foot3[2,0]],color='xkcd:black')
+    ax.plot([k3[0,0],foot3[0,0]],[k3[2,0],foot3[2,0]],color='xkcd:red')
 
     #Plot Tibia 4
-    ax.plot([k4[0,0],foot4[0,0]],[k4[2,0],foot4[2,0]],color='xkcd:black')
+    ax.plot([k4[0,0],foot4[0,0]],[k4[2,0],foot4[2,0]],color='xkcd:purple')
 
     #Plot surface
-    ax.plot([-0.3,-l_b/2+distance_from_step,-l_b/2+distance_from_step,l_b/2+distance_from_step+0.4],[0,0,step_height,step_height])
+    ax.plot([-0.3,-l_b/2+distance_from_step,-l_b/2+distance_from_step,l_b/2+distance_from_step+0.4],[0,0,step_height,step_height],color='xkcd:black')
 
 # _________________________________Cascade Gait Plotting Fucntion___________________________
 def plot_robot_sequence(i,ax,step):
@@ -332,7 +332,7 @@ def plot_robot_sequence(i,ax,step):
     ax.plot([k4[0,0],foot4[0,0]],[k4[2,0],foot4[2,0]],color='xkcd:purple')
 
     #Plot surface
-    # ax.plot([-0.3,-l_b/2+distance_from_step,-l_b/2+distance_from_step,l_b/2+distance_from_step+0.4],[0,0,step_height,step_height])
+    ax.plot([-0.3+offset*step,-l_b/2+distance_from_step+offset*step,-l_b/2+distance_from_step+offset*step,l_b/2+distance_from_step+0.2+offset*step],[0,0,step_height,step_height],color='xkcd:black')
 
 
 # _____________________________________Stills of linearised gaits________________________________________________
@@ -363,7 +363,7 @@ for g in step:
     plot_robot_sequence(sequence[g],ax3,step[g])
 
 plt.savefig(path+"..\..\..\post_processing\image_sorting\\"+trajectory_name+"_cascade.png", transparent=True, bbox_inches='tight', dpi=500) #bbox_inches is used to remove excess white around figure, dpi(dots per inch) image quality
-
+__logger.info("Linearisation complete")
 # 2cm:
 #0,4,6,10,14, 20,26,30,34,39
 # 0,6,14,26,34,39
