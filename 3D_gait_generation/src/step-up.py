@@ -1728,21 +1728,27 @@ if __run_config.should_step_up_front():
         if i>5*__run_config.num_nodes/8:
             stairs_2[i]=__run_config.stair_climb_params.stair_height
 
+    m.step_height_1 = Constraint(m.N, m.cN, rule = step_height_1)
+    m.step_height_2 = Constraint(m.N, m.cN, rule = step_height_2)
+
 elif __run_config.should_step_up_hind():
     m.step_distance_3_min = Constraint(m.N, m.cN, rule = step_distance_3_min)
     m.step_distance_3_max = Constraint(m.N, m.cN, rule = step_distance_3_max)
     m.step_distance_4_max = Constraint(m.N, m.cN, rule = step_distance_4_max)
     m.step_distance_4_min = Constraint(m.N, m.cN, rule = step_distance_4_min)
+    m.q0[1, 'theta_bz'].value = 0.00
 
     for i in range(__run_config.num_nodes+1):
         m.q0[n,'theta_by'] >= -0.052 #3 degs
-        m.q0[1, 'theta_bz'].value = 0.0
         stairs_1[i]=__run_config.stair_climb_params.stair_height
         stairs_2[i]=__run_config.stair_climb_params.stair_height
         if i>7*__run_config.num_nodes/8:
             stairs_3[i]=__run_config.stair_climb_params.stair_height
         if i>3*__run_config.num_nodes/8:
             stairs_4[i]=__run_config.stair_climb_params.stair_height
+    
+    m.step_height_3 = Constraint(m.N, m.cN, rule = step_height_3)
+    m.step_height_4 = Constraint(m.N, m.cN, rule = step_height_4)
 
 elif __run_config.should_walk():
     m.q[__run_config.num_nodes, constants.cN, 'theta_bz'].value = 0.0
@@ -1762,14 +1768,14 @@ elif __run_config.should_walk():
     m.finalthh4 = Constraint(m.N, rule = finalthh4)
     m.finalthk4 = Constraint(m.N, rule = finalthk4)
 
+    m.step_height_1 = Constraint(m.N, m.cN, rule = step_height_1)
+    m.step_height_2 = Constraint(m.N, m.cN, rule = step_height_2)
+    m.step_height_3 = Constraint(m.N, m.cN, rule = step_height_3)
+    m.step_height_4 = Constraint(m.N, m.cN, rule = step_height_4)
+
 m.midXMin = Constraint(m.N, rule = midXMin)
 m.finalXMin = Constraint(m.N, rule = finalXMin)
 m.finalXMax = Constraint(m.N, rule = finalXMax)
-
-m.step_height_1 = Constraint(m.N, m.cN, rule = step_height_1)
-m.step_height_2 = Constraint(m.N, m.cN, rule = step_height_2)
-m.step_height_3 = Constraint(m.N, m.cN, rule = step_height_3)
-m.step_height_4 = Constraint(m.N, m.cN, rule = step_height_4)
 
 m.contact_order_1 = Constraint(m.N,m.cN,rule=contact_order_1)
 m.contact_order_2 = Constraint(m.N,m.cN,rule=contact_order_2)
@@ -1934,18 +1940,21 @@ D = 5.0
 Domain = np.linspace(0,D,__run_config.num_nodes)
 Range = np.linspace(0,R,__run_config.num_nodes)
 
-if not os.path.exists(__run_config.get_model_path()):
-    if (__run_config.movement_action == 'walk'):
-       resource = '3D_col_ros.csv'
-    elif(__run_config.movement_action == 'step-up-front'):
-       resource = '3D_col_ros_1.csv'
-    elif(__run_config.movement_action == 'step-up-hind'):
-       resource = '3D_col_ros_1.csv'
-    m=seed.get_initial_seed(m,__run_config, resource)
+# Random seed, I'll be fancy later, just a test for now
+m=seed.get_random_seed(m,__run_config)
 
-else:
-    m=seed.get_refined_seed(m,__run_config)
-    __logger.info(f"Using the refined seed\n completed iterations: {m.iterations_complete}")
+# if not os.path.exists(__run_config.get_model_path()):
+#     if (__run_config.movement_action == 'walk'):
+#        resource = '3D_col_ros.csv'
+#     elif(__run_config.movement_action == 'step-up-front'):
+#        resource = '3D_col_ros_1.csv'
+#     elif(__run_config.movement_action == 'step-up-hind'):
+#        resource = '3D_col_ros_1.csv'
+#     m=seed.get_initial_seed(m,__run_config, resource)
+
+# else:
+#     m=seed.get_refined_seed(m,__run_config)
+#     __logger.info(f"Using the refined seed\n completed iterations: {m.iterations_complete}")
 
 #Steady State
 #--------------------------------------------------------------
@@ -1958,8 +1967,8 @@ def minimum_z(m,n):
 #m.minimum_z = Constraint(m.N, rule = minimum_z)
 
 #initial variables
-m.q[1,1,'x'].value = 0.0
-m.q[1,1,'x'].fixed = True
+# m.q[1,1,'x'].value = 0.0
+# m.q[1,1,'x'].fixed = True
 m.q[1,1,'y'].value = 0.0
 m.q[1,1,'y'].fixed = True
 
