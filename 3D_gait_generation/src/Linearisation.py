@@ -343,8 +343,12 @@ fig1, ax1 = plt.subplots(1,1)
 update = lambda i: TwoD_plot_robot(i,ax1) #lambdify update function
 
 animate = ani.FuncAnimation(fig1,update,range(0,len(SS_H1)),interval = 50,repeat=False)
-animate.save(path+"..\..\..\post_processing\image_sorting\\"+trajectory_name+".gif", writer='PillowWriter', fps=10)
+animate.save(path+"../../../post_processing/image_sorting/"+trajectory_name+".gif", writer='PillowWriter', fps=10)
 HTML(animate.to_jshtml())
+
+__logger.info(f"Path: {path}")
+result_path=path+"../../../post_processing/image_sorting/"
+__logger.info(f"Results path: {result_path}")
 
 fig2, ax2 = plt.subplots(1,1)
 for i in np.linspace(0,len(SS_H1)-1,still_nr):
