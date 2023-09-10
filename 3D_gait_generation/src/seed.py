@@ -121,7 +121,7 @@ def get_refined_seed(m,run_config):
     return m
 
 def get_random_seed(m,run_config):
-    for n in range(1,constants.N+1):
+    for n in range(1,run_config.num_nodes.N+1):
         for c in range (1, constants.cN+1): 
             #Randomizing Q Matrix
             m.q[n,c,'x'].value = 0.01   
