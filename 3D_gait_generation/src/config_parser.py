@@ -34,7 +34,6 @@ class RunConfig:
     movement_action: str # Choose from available gaits: "walk, step-up", code is set up to walk, by default.
     travel_distance: float # min=travel_distance, max=2*travel_distance of body coordinate x
     refine: str # Full UUID that needs to be refined, otherwise its starts the solver from scratch 
-    dimension: constants.Dimension # either TWO_D or THREE_D
     unique_run_id: str # uniquely identifies a specific run apart from the result name, allowing multiple runs of the same name
     ipopt_config: IpoptConfig
     stair_climb_params: StairClimbParams
@@ -112,7 +111,6 @@ def parse_config(config_file_path):
                      str(rawConfig["movement_action"]) if 'movement_action' in rawConfig else "walk",
                      float(rawConfig["travel_distance"]) if 'travel_distance' in rawConfig else 0.05,
                      str(rawConfig["refine"]) if 'refine' in rawConfig else "no",
-                     dimension=constants.Dimension[rawConfig["dimensionality"]] if 'dimensionality' in rawConfig else "THREE_D",
                      unique_run_id = str(uuid.uuid4()),
                      ipopt_config = ipopt,
                      stair_climb_params=climb_params)
