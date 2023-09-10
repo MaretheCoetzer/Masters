@@ -6,7 +6,6 @@
   "num_nodes": 40,
   "iterations": 5,
   "refine": "no",
-  "dimensionality": "THREE_D",
 
   "movement_action": "step-up-hind",
   "clearance_z": 0.02,   
