@@ -27,7 +27,7 @@ int node=0;
 int first=0;
 int input=0;
 int end_time=0;
-int time_step=100000;
+int time_step=70000;
 int steps = sizeof(SS_servo0)/sizeof(SS_servo0[0]);
 
 // -------------------Joint configurations-------------------
@@ -54,7 +54,7 @@ void setup() {
 
   pca9685.setOscillatorFrequency(27000000); //Value between 24MHz and 27MHz, tuned for this setup
   pca9685.setPWMFreq(SERVO_FREQ);
-  delay (500);
+  delay (3000);
 
   servo0_deg=SS_servo0[0]/3.14159265*180;
         servo0=map(servo0_deg,-38,90,2200,1030);
@@ -132,6 +132,27 @@ void setup() {
         Serial.print(servo7_deg);
         Serial.print("        us:");
         Serial.println(servo7);
+
+        delay(1000);
+        Serial.println("10");
+        delay(1000);
+        Serial.println("9");
+        delay(1000);
+        Serial.println("8");
+        delay(1000);
+        Serial.println("7");
+        delay(1000);
+        Serial.println("6");
+        delay(1000);
+        Serial.println("5");
+        delay(1000);
+        Serial.println("4");
+        delay(1000);
+        Serial.println("3");
+        delay(1000);
+        Serial.println("2");
+        delay(1000);
+        Serial.println("1");
 }
 
 void loop() 
@@ -215,56 +236,56 @@ void loop()
         pca9685.setPWM(SER6,0,servo6);
         pca9685.setPWM(SER7,0,servo7);
 
-        Serial.print("Node:");
-        Serial.println(node);
-        Serial.print("servo0 -> rads:");
-        Serial.print(SS_servo0[node]);
-        Serial.print("        deg:");
-        Serial.print(servo0_deg);
-        Serial.print("        us:");
-        Serial.println(servo0);
-        Serial.print("servo1 -> rads:");
-        Serial.print(SS_servo1[node]);
-        Serial.print("        deg:");
-        Serial.print(servo1_deg);
-        Serial.print("        us:");
-        Serial.println(servo1);
-        Serial.print("servo2 -> rads:");
-        Serial.print(SS_servo2[node]);
-        Serial.print("        deg:");
-        Serial.print(servo2_deg);
-        Serial.print("        us:");
-        Serial.println(servo2);
-        Serial.print("servo3 -> rads:");
-        Serial.print(SS_servo3[node]);
-        Serial.print("        deg:");
-        Serial.print(servo3_deg);
-        Serial.print("        us:");
-        Serial.println(servo3);
-        Serial.print("servo4 -> rads:");
-        Serial.print(SS_servo4[node]);
-        Serial.print("        deg:");
-        Serial.print(servo4_deg);
-        Serial.print("        us:");
-        Serial.println(servo4);
-        Serial.print("servo5 -> rads:");
-        Serial.print(SS_servo5[node]);
-        Serial.print("        deg:");
-        Serial.print(servo5_deg);
-        Serial.print("        us:");
-        Serial.println(servo5);
-        Serial.print("servo6 -> rads:");
-        Serial.print(SS_servo6[node]);
-        Serial.print("        deg:");
-        Serial.print(servo6_deg);
-        Serial.print("        us:");
-        Serial.println(servo6);
-        Serial.print("servo7 -> rads:");
-        Serial.print(SS_servo7[node]);
-        Serial.print("        deg:");
-        Serial.print(servo7_deg);
-        Serial.print("        us:");
-        Serial.println(servo7);
+        // Serial.print("Node:");
+        // Serial.println(node);
+        // Serial.print("servo0 -> rads:");
+        // Serial.print(SS_servo0[node]);
+        // Serial.print("        deg:");
+        // Serial.print(servo0_deg);
+        // Serial.print("        us:");
+        // Serial.println(servo0);
+        // Serial.print("servo1 -> rads:");
+        // Serial.print(SS_servo1[node]);
+        // Serial.print("        deg:");
+        // Serial.print(servo1_deg);
+        // Serial.print("        us:");
+        // Serial.println(servo1);
+        // Serial.print("servo2 -> rads:");
+        // Serial.print(SS_servo2[node]);
+        // Serial.print("        deg:");
+        // Serial.print(servo2_deg);
+        // Serial.print("        us:");
+        // Serial.println(servo2);
+        // Serial.print("servo3 -> rads:");
+        // Serial.print(SS_servo3[node]);
+        // Serial.print("        deg:");
+        // Serial.print(servo3_deg);
+        // Serial.print("        us:");
+        // Serial.println(servo3);
+        // Serial.print("servo4 -> rads:");
+        // Serial.print(SS_servo4[node]);
+        // Serial.print("        deg:");
+        // Serial.print(servo4_deg);
+        // Serial.print("        us:");
+        // Serial.println(servo4);
+        // Serial.print("servo5 -> rads:");
+        // Serial.print(SS_servo5[node]);
+        // Serial.print("        deg:");
+        // Serial.print(servo5_deg);
+        // Serial.print("        us:");
+        // Serial.println(servo5);
+        // Serial.print("servo6 -> rads:");
+        // Serial.print(SS_servo6[node]);
+        // Serial.print("        deg:");
+        // Serial.print(servo6_deg);
+        // Serial.print("        us:");
+        // Serial.println(servo6);
+        // Serial.print("servo7 -> rads:");
+        // Serial.print(SS_servo7[node]);
+        // Serial.print("        deg:");
+        // Serial.print(servo7_deg);
+        // Serial.print("        us:");
+        // Serial.println(servo7);
   
   }
 }
