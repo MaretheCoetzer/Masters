@@ -263,8 +263,8 @@ def step_distance_3_max(m,n,c):
                     m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
                     m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
                     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    if (n<6*__run_config.num_nodes/8):
-	    return lamb_foot3x(*var_list) <=-constants.BodyLength/2
+    # if (n<6*__run_config.num_nodes/8):
+	#     return lamb_foot3x(*var_list) <=-constants.BodyLength/2
     if (n==7*__run_config.num_nodes/8):
         return lamb_foot3x(*var_list) <=-constants.BodyLength/2+__run_config.stair_climb_params.distance_from_step
     if (n==8*__run_config.num_nodes/8):
@@ -318,8 +318,8 @@ def step_distance_4_max(m,n,c):
                     m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
                     m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
                     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    if (n<2*__run_config.num_nodes/8):
-	    return lamb_foot4x(*var_list) <=-constants.BodyLength/2
+    # if (n<2*__run_config.num_nodes/8):
+	#     return lamb_foot4x(*var_list) <=-constants.BodyLength/2
     if (n==3*__run_config.num_nodes/8):
         return lamb_foot4x(*var_list) <=-constants.BodyLength/2+__run_config.stair_climb_params.distance_from_step
     if (n==4*__run_config.num_nodes/8):
@@ -1558,7 +1558,7 @@ J4=foot4_pos.jacobian(q)
 GRF_4 = J4.transpose()*sym.Matrix([[GRF4x],[GRF4y],[GRF4z]])
 
 __logger.info("EOM calc")
-EOM=M*ddq+G-Q-GRF_1-GRF_2-GRF_3-GRF_4+C*dq
+EOM=M*ddq+G-Q-GRF_1-GRF_2-GRF_3-GRF_4#+C*dq
 
 EOMs = sym.zeros(len(q),1)
 EOMcounter = 0
@@ -1773,9 +1773,9 @@ elif __run_config.should_walk():
     m.step_height_3 = Constraint(m.N, m.cN, rule = step_height_3)
     m.step_height_4 = Constraint(m.N, m.cN, rule = step_height_4)
 
-m.midXMin = Constraint(m.N, rule = midXMin)
-m.finalXMin = Constraint(m.N, rule = finalXMin)
-m.finalXMax = Constraint(m.N, rule = finalXMax)
+# m.midXMin = Constraint(m.N, rule = midXMin)
+# m.finalXMin = Constraint(m.N, rule = finalXMin)
+# m.finalXMax = Constraint(m.N, rule = finalXMax)
 
 m.contact_order_1 = Constraint(m.N,m.cN,rule=contact_order_1)
 m.contact_order_2 = Constraint(m.N,m.cN,rule=contact_order_2)
