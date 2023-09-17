@@ -263,8 +263,8 @@ def step_distance_3_max(m,n,c):
                     m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
                     m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
                     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    # if (n<6*__run_config.num_nodes/8):
-	#     return lamb_foot3x(*var_list) <=-constants.BodyLength/2
+    if (n<6*__run_config.num_nodes/8):
+	    return lamb_foot3x(*var_list) <=-constants.BodyLength/2
     if (n==7*__run_config.num_nodes/8):
         return lamb_foot3x(*var_list) <=-constants.BodyLength/2+__run_config.stair_climb_params.distance_from_step
     if (n==8*__run_config.num_nodes/8):
@@ -318,8 +318,8 @@ def step_distance_4_max(m,n,c):
                     m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
                     m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
                     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    # if (n<2*__run_config.num_nodes/8):
-	#     return lamb_foot4x(*var_list) <=-constants.BodyLength/2
+    if (n<2*__run_config.num_nodes/8):
+	    return lamb_foot4x(*var_list) <=-constants.BodyLength/2
     if (n==3*__run_config.num_nodes/8):
         return lamb_foot4x(*var_list) <=-constants.BodyLength/2+__run_config.stair_climb_params.distance_from_step
     if (n==4*__run_config.num_nodes/8):
@@ -422,7 +422,7 @@ def finalthk4(m,n):
         return Constraint.Skip
 
 def total_cost_function(m):
-   return sum(m.h[n] for n in range(1,__run_config.num_nodes+1))/m.q0[__run_config.num_nodes,'x']
+   return sum(m.h[n] for n in range(1,__run_config.num_nodes+1))/(m.q0[__run_config.num_nodes,'x']-m.q0[1,'x'])
     # return sum(((m.tau_h1[n]**2+m.tau_k1[n]**2+m.tau_h2[n]**2+m.tau_k2[n]**2+m.tau_h3[n]**2+m.tau_k3[n]**2+m.tau_h4[n]**2+m.tau_k4[n]**2)*m.h[n]) for n in range(1,__run_config.num_nodes+1))/m.q0[n,'x'] #Minimum total actuator force and torque
 #     return sum(((m.tau_h1[n]**2+m.tau_k1[n]**2+m.tau_h2[n]**2+m.tau_k2[n]**2+m.tau_h3[n]**2+m.tau_k3[n]**2+m.tau_h4[n]**2+m.tau_k4[n]**2)) for n in range(1,__run_config.num_nodes+1)) #Minimum total actuator force and torque
 #     return sum(m.h[n]/(m.q0[n+1,'x']-m.q0[n,'x']) for n in range(1,__run_config.num_nodes+1))
@@ -1775,7 +1775,7 @@ elif __run_config.should_walk():
 
 # m.midXMin = Constraint(m.N, rule = midXMin)
 # m.finalXMin = Constraint(m.N, rule = finalXMin)
-# m.finalXMax = Constraint(m.N, rule = finalXMax)
+m.finalXMax = Constraint(m.N, rule = finalXMax)
 
 m.contact_order_1 = Constraint(m.N,m.cN,rule=contact_order_1)
 m.contact_order_2 = Constraint(m.N,m.cN,rule=contact_order_2)
@@ -2229,7 +2229,8 @@ script_opts = Trajectory_reader.ScriptOptions(silent=True, result_name=__run_con
 Trajectory_reader.gen_trajectories(script_opts)
 
 duration=m.tt0[__run_config.num_nodes].value-m.tt0[1].value
-__logger.info(f"Final distance travelled: {m.q0[__run_config.num_nodes,'x'].value}")
+travel_dist=m.q0[__run_config.num_nodes,'x'].value-m.q0[1,'x'].value
+__logger.info(f"Final distance travelled: {travel_dist}")
 __logger.info(f"Total travel time: {duration}")
 __logger.info("Finito")
 
