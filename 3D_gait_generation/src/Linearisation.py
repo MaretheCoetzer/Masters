@@ -36,7 +36,7 @@ import os
 import log
 __logger = log.setup_custom_logger("3D_data_processing")
 
-trajectory_name = 'StepUp2feet_1'
+trajectory_name = 'SS_walk_1cm_z_clearance'
 # Assigning values
 step=0.01 #s
 
@@ -113,8 +113,8 @@ l_b = Properties.iloc[0,10]
 l_w = Properties.iloc[0,11]
 l_f1 = Properties.iloc[0,12]
 l_t1 = Properties.iloc[0,13]
-step_height = 0.05 #Properties.iloc[0,20]   #step up front: 0.05, default is set up for step up hind
-distance_from_step = 0.05+l_b+0.08 #Properties.iloc[0,21] #step up front: 0.05+l_b+0.08, default is set up for step up hind
+step_height = Properties.iloc[0,20]   #step up front: 0.05, default is set up for step up hind
+distance_from_step = Properties.iloc[0,21] #step up front: 0.05+l_b+0.08, default is set up for step up hind
 
 for n in range (1,len(t)):
     t[n]=t[n]+t[n-1]
@@ -185,7 +185,7 @@ def TwoD_plot_robot(i,ax):
     ax.set_xlabel('x')
     ax.set_ylabel('z')
     ax.set_xlim(-0.3, 1.1) 
-    ax.set_ylim(-0.0, 0.4)
+    ax.set_ylim(-0.0, 1.0)
 
     rx=[[1, 0, 0], [0, np.cos(SS_BX[i]), -np.sin(SS_BX[i])], [0, np.sin(SS_BX[i]), np.cos(SS_BX[i])]]
     ry=[[np.cos(SS_BY[i]), 0, np.sin(SS_BY[i])], [0, 1, 0], [-np.sin(SS_BY[i]), 0, np.cos(SS_BY[i])]]
@@ -256,7 +256,7 @@ def TwoD_plot_robot(i,ax):
     ax.plot([k4[0,0],foot4[0,0]],[k4[2,0],foot4[2,0]],color='xkcd:purple')
 
     #Plot surface
-    ax.plot([-0.3,-l_b/2+distance_from_step,-l_b/2+distance_from_step,l_b/2+distance_from_step-0.2],[0,0,step_height,step_height],color='xkcd:black')
+    ax.plot([-0.3,-l_b/2+distance_from_step,-l_b/2+distance_from_step,l_b/2+distance_from_step+0.4],[0,0,step_height,step_height],color='xkcd:black')
 
 # _________________________________Cascade Gait Plotting Fucntion___________________________
 def plot_robot_sequence(i,ax,step):
@@ -352,18 +352,18 @@ HTML(animate.to_jshtml())
 # result_path=path+"../../../post_processing/image_sorting/"
 # __logger.info(f"Results path: {result_path}")
 
-fig2, ax2 = plt.subplots(1,1)
-for i in np.linspace(0,len(SS_H1)-1,still_nr):
-    TwoD_plot_robot(int(i),ax2)
-    plt.title({int(i)})
-    plt.savefig(path+"..\..\..\post_processing\image_sorting\\"+trajectory_name+"_"+str(int(i))+".png", transparent=True, bbox_inches='tight') #bbox_inches is used to remove excess white around figure
+# fig2, ax2 = plt.subplots(1,1)
+# for i in np.linspace(0,len(SS_H1)-1,still_nr):
+#     TwoD_plot_robot(int(i),ax2)
+#     plt.title({int(i)})
+#     plt.savefig(path+"..\..\..\post_processing\image_sorting\\"+trajectory_name+"_"+str(int(i))+".png", transparent=True, bbox_inches='tight') #bbox_inches is used to remove excess white around figure
 
-fig3, ax3 = plt.subplots(1,1)    
-for g in step:
-    plot_robot_sequence(sequence[g],ax3,step[g])
+# fig3, ax3 = plt.subplots(1,1)    
+# for g in step:
+#     plot_robot_sequence(sequence[g],ax3,step[g])
 
-plt.savefig(path+"..\..\..\post_processing\image_sorting\\"+trajectory_name+"_cascade.png", transparent=True, bbox_inches='tight', dpi=500) #bbox_inches is used to remove excess white around figure, dpi(dots per inch) image quality
-__logger.info("Linearisation complete")
+# plt.savefig(path+"..\..\..\post_processing\image_sorting\\"+trajectory_name+"_cascade.png", transparent=True, bbox_inches='tight', dpi=500) #bbox_inches is used to remove excess white around figure, dpi(dots per inch) image quality
+# __logger.info("Linearisation complete")
 # 2cm:
 #0,4,6,10,14, 20,26,30,34,39
 # 0,6,14,26,34,39
