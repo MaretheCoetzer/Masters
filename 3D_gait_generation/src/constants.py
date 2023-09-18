@@ -32,5 +32,5 @@ co_location_a = [[0.19681547722366, 0.39442431473909, 0.37640306270047],
 # Return: A list of degrees of freedoms
 DOFs = ['x','y','z','theta_bx','theta_by','theta_bz','theta_h1','theta_k1','theta_h2','theta_k2','theta_h3','theta_k3','theta_h4','theta_k4']
 
-BodyWidth = 0.172 
+BodyWidth = 0.185 
 LegRadius = 0.06 
