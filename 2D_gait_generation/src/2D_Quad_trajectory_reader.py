@@ -35,7 +35,7 @@ import os
 import log
 __logger = log.setup_custom_logger("2D_data_processing")
 
-trajectory_name = '12'
+trajectory_name = 'TwoD_SS_78'
 
 # Assigning values
 step=0.01 #s
@@ -53,7 +53,7 @@ def _get_result_dir(result_name):
     __logger.info(f"Found parent dir={parent_dir}")
 
     # If we do not have the results directory bail out
-    results_path = "{}/results/{}/".format(parent_dir, result_name)
+    results_path = parent_dir+"/Results/"
     if not os.path.exists(results_path):
         __logger.error(f"Could not find result path {results_path} - exiting")
         raise Exception("Could not find results directory")
@@ -67,10 +67,10 @@ def _load_results(result_dir):
     CSV object
     """
     __logger.info(f"Loading results from {result_dir}")
-    Properties =  _load_single_result(result_dir + "3D_Properties.csv")
-    Movement =  _load_single_result(result_dir + "3D_col_ros.csv")
-    Torque =  _load_single_result(result_dir + "3D_Nodal.csv")
-    Ros =  _load_single_result(result_dir + "3D_col_traj.csv")
+    Properties =  _load_single_result(result_dir + trajectory_name+"_Properties.csv")
+    Movement =  _load_single_result(result_dir + trajectory_name+"_col_ros.csv")
+    Torque =  _load_single_result(result_dir + trajectory_name+"_Torque.csv")
+    Ros =  _load_single_result(result_dir + trajectory_name+"_col_traj.csv")
     return [Properties, Movement, Torque, Ros]
 
 
@@ -204,7 +204,7 @@ print(f'float SS_servo0[] = {SS_H1};\nfloat SS_servo1[] = {SS_K1};\nfloat SS_ser
 def plot_robot(i,ax): #update function for animation
     ax.clear()
     ax.set_xlim([-0.5,1])
-    ax.set_ylim([0.0,0.7])
+    ax.set_ylim([0.0,1.0])
     
    #plot body
     legb_xt = X[i] + 0.5*l_b*np.sin(SS_BY[i])
@@ -329,7 +329,7 @@ fig1, ax1 = plt.subplots(1,1) #create axes
 update = lambda i: plot_robot(i,ax1) #lambdify update function
 
 animate = ani.FuncAnimation(fig1,update,range(0,len(SS_H1)),interval = 50,repeat=False)
-animate.save(path+"..\..\..\post_processing\image_sorting\\"+trajectory_name+".gif", writer='PillowWriter', fps=10)
+animate.save(path+"..\..\post_processing\image_sorting\\"+trajectory_name+".gif", writer='PillowWriter', fps=10)
 HTML(animate.to_jshtml())
 
 # _____________________________________Stills of linearised gaits________________________________________________
@@ -340,7 +340,7 @@ fig2, ax2 = plt.subplots(1,1)
 for i in np.linspace(0,len(SS_H1)-1,still_nr):
     plot_robot(int(i),ax2)
     plt.title({int(i)})
-    # plt.savefig(path+"..\..\..\post_processing\image_sorting\\"+trajectory_name+"_"+str(int(i))+".png", transparent=True, bbox_inches='tight') #bbox_inches is used to remove excess white around figure
+    # plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_"+str(int(i))+".png", transparent=True, bbox_inches='tight') #bbox_inches is used to remove excess white around figure
 
 fig3, ax3 = plt.subplots(1,1)    
 sequence = np.array([0,12,20,48,56,64,76])
@@ -350,6 +350,6 @@ print(len(step))
 plot_robot_sequence(sequence,ax3,1,step)
 # in hind sight not sure how this one works with step being inputted as an array independent of sequence, if it stops working consult 3D linearisation.
 
-# plt.savefig(path+"..\..\..\post_processing\image_sorting\\"+trajectory_name+"_cascade.png", transparent=True, bbox_inches='tight',dpi=500) #bbox_inches is used to remove excess white around figure, dpi(dots per inch) image quality
+# plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_cascade.png", transparent=True, bbox_inches='tight',dpi=500) #bbox_inches is used to remove excess white around figure, dpi(dots per inch) image quality
 
 
