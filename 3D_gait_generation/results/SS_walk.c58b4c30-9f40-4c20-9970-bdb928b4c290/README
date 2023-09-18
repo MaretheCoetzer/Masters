@@ -1,0 +1,1 @@
+tmin = 0.01, bodywidth increased from 0.172 to 0.185, added minimum travel and max=2*travel dist, random seeding removed
