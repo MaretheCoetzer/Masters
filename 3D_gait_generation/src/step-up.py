@@ -103,11 +103,6 @@ def integrate_time(m,n,c): # for time
 
 # ------------------------------------------------------------------------------------------
 # ROBOT SPECIFIC CONSTRAINTS
-
-
-# force robot to achieve distance of 2 cm half way through the trajectory (should have foot above step at this point)
-# force robot to achieve distance of 4 cm at end of the trajectory (should have foot on step at this point)
-
 def step_height_1(m,n,c):       
     var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
                     m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
@@ -550,179 +545,6 @@ def friction_3_3D(m,n,c):
     return (m.mu*m.GRF3[n,c,'Z','ps'])**2 >= ((m.GRF3[n,c,'X','ps'] + m.GRF3[n,c,'X','ng'])**2+(m.GRF3[n,c,'Y','ps'] + m.GRF3[n,c,'Y','ng'])**2)
 def friction_4_3D(m,n,c):   
     return (m.mu*m.GRF4[n,c,'Z','ps'])**2 >= ((m.GRF4[n,c,'X','ps'] + m.GRF4[n,c,'X','ng'])**2+(m.GRF4[n,c,'Y','ps'] + m.GRF4[n,c,'Y','ng'])**2)
-
-#SLIP
-# Leg 1 --------------------------------------------------------------------------------------------------------------
-#SLIP POS DIR
-def def_a_slip_p_1(m,n,c):   
-    var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
-                    m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
-                    m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
-                    m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
-                    m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
-                    m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
-                    m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
-                    m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
-                    m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
-                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    return m.a_slip_p_1[n,c] ==m.gamma_1[n,c]+lamb_foot1dx(*var_list)
-def def_b_slip_p_1(m,n,c):   
-    return m.b_slip_p_1[n,c] == m.GRF1[n,c,'X','ps']
-#condition
-def def_slip_p_1_pr(m,n):
-    a_slip_p_1_pr = m.a_slip_p_1[n,1] + m.a_slip_p_1[n,2] + m.a_slip_p_1[n,3] 
-    b_slip_p_1_pr = m.b_slip_p_1[n,1] + m.b_slip_p_1[n,2] + m.b_slip_p_1[n,3]  
-    return a_slip_p_1_pr*b_slip_p_1_pr <= m.eps
-
-# SLIP NEG DIR
-def def_a_slip_n_1(m,n,c):   
-    var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
-                    m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
-                    m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
-                    m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
-                    m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
-                    m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
-                    m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
-                    m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
-                    m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
-                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    return m.a_slip_n_1[n,c] ==m.gamma_1[n,c]-lamb_foot1dx(*var_list)
-def def_b_slip_n_1(m,n,c):   
-    return m.b_slip_n_1[n,c] == m.GRF1[n,c,'X','ng']
-#condition
-def def_slip_n_1_pr(m,n):
-    a_slip_n_1_pr = m.a_slip_n_1[n,1] + m.a_slip_n_1[n,2] + m.a_slip_n_1[n,3] 
-    b_slip_n_1_pr = m.b_slip_n_1[n,1] + m.b_slip_n_1[n,2] + m.b_slip_n_1[n,3]  
-    return a_slip_n_1_pr*b_slip_n_1_pr <= m.eps
-
-# Leg 2 --------------------------------------------------------------------------------------------------------------
-#SLIP POS DIR
-def def_a_slip_p_2(m,n,c):   
-    var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
-                    m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
-                    m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
-                    m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
-                    m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
-                    m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
-                    m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
-                    m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
-                    m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
-                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    return m.a_slip_p_2[n,c] ==m.gamma_2[n,c]+lamb_foot2dx(*var_list)
-def def_b_slip_p_2(m,n,c):   
-    return m.b_slip_p_2[n,c] == m.GRF2[n,c,'X','ps']
-#condition
-def def_slip_p_2_pr(m,n):
-    a_slip_p_2_pr = m.a_slip_p_2[n,1] + m.a_slip_p_2[n,2] + m.a_slip_p_2[n,3] 
-    b_slip_p_2_pr = m.b_slip_p_2[n,1] + m.b_slip_p_2[n,2] + m.b_slip_p_2[n,3]  
-    return a_slip_p_2_pr*b_slip_p_2_pr <= m.eps
-
-# SLIP NEG DIR
-def def_a_slip_n_2(m,n,c):   
-    var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
-                    m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
-                    m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
-                    m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
-                    m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
-                    m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
-                    m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
-                    m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
-                    m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
-                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    return m.a_slip_n_2[n,c] ==m.gamma_2[n,c]-lamb_foot2dx(*var_list)
-def def_b_slip_n_2(m,n,c):   
-    return m.b_slip_n_2[n,c] == m.GRF2[n,c,'X','ng']
-#condition
-def def_slip_n_2_pr(m,n):
-    a_slip_n_2_pr = m.a_slip_n_2[n,1] + m.a_slip_n_2[n,2] + m.a_slip_n_2[n,3] 
-    b_slip_n_2_pr = m.b_slip_n_2[n,1] + m.b_slip_n_2[n,2] + m.b_slip_n_2[n,3]  
-    return a_slip_n_2_pr*b_slip_n_2_pr <= m.eps
-
-# Leg 3 --------------------------------------------------------------------------------------------------------------
-#SLIP POS DIR
-def def_a_slip_p_3(m,n,c):   
-    var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
-                    m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
-                    m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
-                    m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
-                    m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
-                    m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
-                    m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
-                    m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
-                    m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
-                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    return m.a_slip_p_3[n,c] ==m.gamma_3[n,c]+lamb_foot3dx(*var_list)
-def def_b_slip_p_3(m,n,c):   
-    return m.b_slip_p_3[n,c] == m.GRF3[n,c,'X','ps']
-#condition
-def def_slip_p_3_pr(m,n):
-    a_slip_p_3_pr = m.a_slip_p_3[n,1] + m.a_slip_p_3[n,2] + m.a_slip_p_3[n,3] 
-    b_slip_p_3_pr = m.b_slip_p_3[n,1] + m.b_slip_p_3[n,2] + m.b_slip_p_3[n,3]  
-    return a_slip_p_3_pr*b_slip_p_3_pr <= m.eps
-
-# SLIP NEG DIR
-def def_a_slip_n_3(m,n,c):   
-    var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
-                    m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
-                    m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
-                    m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
-                    m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
-                    m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
-                    m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
-                    m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
-                    m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
-                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    return m.a_slip_n_3[n,c] ==m.gamma_3[n,c]-lamb_foot3dx(*var_list)
-def def_b_slip_n_3(m,n,c):   
-    return m.b_slip_n_3[n,c] == m.GRF3[n,c,'X','ng']
-#condition
-def def_slip_n_3_pr(m,n):
-    a_slip_n_3_pr = m.a_slip_n_3[n,1] + m.a_slip_n_3[n,2] + m.a_slip_n_3[n,3] 
-    b_slip_n_3_pr = m.b_slip_n_3[n,1] + m.b_slip_n_3[n,2] + m.b_slip_n_3[n,3]  
-    return a_slip_n_3_pr*b_slip_n_3_pr <= m.eps
-
-# Leg 4 --------------------------------------------------------------------------------------------------------------
-#SLIP POS DIR
-def def_a_slip_p_4(m,n,c):   
-    var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
-                    m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
-                    m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
-                    m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
-                    m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
-                    m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
-                    m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
-                    m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
-                    m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
-                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    return m.a_slip_p_4[n,c] ==m.gamma_4[n,c]+lamb_foot4dx(*var_list)
-def def_b_slip_p_4(m,n,c):   
-    return m.b_slip_p_4[n,c] == m.GRF4[n,c,'X','ps']
-#condition
-def def_slip_p_4_pr(m,n):
-    a_slip_p_4_pr = m.a_slip_p_4[n,1] + m.a_slip_p_4[n,2] + m.a_slip_p_4[n,3] 
-    b_slip_p_4_pr = m.b_slip_p_4[n,1] + m.b_slip_p_4[n,2] + m.b_slip_p_4[n,3]  
-    return a_slip_p_4_pr*b_slip_p_4_pr <= m.eps
-
-# SLIP NEG DIR
-def def_a_slip_n_4(m,n,c):   
-    var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
-                    m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
-                    m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
-                    m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
-                    m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
-                    m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
-                    m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
-                    m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
-                    m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
-                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    return m.a_slip_n_4[n,c] ==m.gamma_4[n,c]-lamb_foot4dx(*var_list)
-def def_b_slip_n_4(m,n,c):   
-    return m.b_slip_n_4[n,c] == m.GRF4[n,c,'X','ng']
-#condition
-def def_slip_n_4_pr(m,n):
-    a_slip_n_4_pr = m.a_slip_n_4[n,1] + m.a_slip_n_4[n,2] + m.a_slip_n_4[n,3] 
-    b_slip_n_4_pr = m.b_slip_n_4[n,1] + m.b_slip_n_4[n,2] + m.b_slip_n_4[n,3]  
-    return a_slip_n_4_pr*b_slip_n_4_pr <= m.eps
 
 # ------------------------------------------------------------------------------------------
 # GROUND REACTION FORCES 
@@ -1299,25 +1121,25 @@ def relative_th_k1a(m,n):
     return m.q0[n,'theta_k1']-m.q0[n,'theta_h1'] >= 0.1
 
 def th_h1_constraint(m,n):
-    return m.q0[n,'theta_h1'] >= -30/180*np.pi
+    return m.q0[n,'theta_h1'] >= -35/180*np.pi
 
 def relative_th_k2a(m,n):
     return m.q0[n,'theta_k2']-m.q0[n,'theta_h2'] >= 0.1 
 
 def th_h2_constraint(m,n):
-    return m.q0[n,'theta_h2'] >= -30/180*np.pi
+    return m.q0[n,'theta_h2'] >= -35/180*np.pi
 
 def relative_th_k3a(m,n):
     return m.q0[n,'theta_k3']-m.q0[n,'theta_h3'] <= -0.1
 
 def th_h3_constraint(m,n):
-    return m.q0[n,'theta_h3'] <= 30/180*np.pi
+    return m.q0[n,'theta_h3'] <= 35/180*np.pi
 
 def relative_th_k4a(m,n):
     return m.q0[n,'theta_k4']-m.q0[n,'theta_h4'] <= -0.1
 
 def th_h4_constraint(m,n):
-    return m.q0[n,'theta_h4'] <= 30/180*np.pi
+    return m.q0[n,'theta_h4'] <= 35/180*np.pi
 
 # ------------------------------------------------------------------------------------------
 # CURRENT SCRIPT ENTRY POINT 
@@ -1523,11 +1345,12 @@ G  = sym.zeros(len(q),1)
 for i in range(len(q)):
     G[i] = sym.diff(V,q[i]);  
 
-C  = sym.zeros(len(q),len(q))  
-for i in range(len(q)):                                             
-   for j in range(len(q)):
-       for n in range(len(q)):
-           C[i,j] = C[i,j]+ 0.5*(sym.diff(M[i,j],q[n]) + sym.diff(M[i,n],q[j]) - sym.diff(M[j,n],q[i]))*dq[n]
+#C  = sym.zeros(len(q),len(q))  
+#for i in range(len(q)):                                             
+#   for j in range(len(q)):
+#       for n in range(len(q)):
+#           C[i,j] = C[i,j]+ 0.5*(sym.diff(M[i,j],q[n]) + sym.diff(M[i,n],q[j]) - sym.diff(M[j,n],q[i]))*dq[n]
+
  
 Q = sym.zeros(len(q),1)
 Q[0]=0                 #x
@@ -1751,6 +1574,12 @@ elif __run_config.should_step_up_hind():
     m.step_height_4 = Constraint(m.N, m.cN, rule = step_height_4)
 
 elif __run_config.should_walk():
+#initial variables:
+    m.q[1,1,'x'].value = 0.0
+    m.q[1,1,'x'].fixed = True
+    m.q[1,1,'y'].value = 0.0
+    m.q[1,1,'y'].fixed = True
+
     m.q[__run_config.num_nodes, constants.cN, 'theta_bz'].value = 0.0
     m.q[__run_config.num_nodes, constants.cN, 'theta_bz'].fixed = True
 
@@ -1773,8 +1602,8 @@ elif __run_config.should_walk():
     m.step_height_3 = Constraint(m.N, m.cN, rule = step_height_3)
     m.step_height_4 = Constraint(m.N, m.cN, rule = step_height_4)
 
-# m.midXMin = Constraint(m.N, rule = midXMin)
-# m.finalXMin = Constraint(m.N, rule = finalXMin)
+m.midXMin = Constraint(m.N, rule = midXMin)
+m.finalXMin = Constraint(m.N, rule = finalXMin)
 m.finalXMax = Constraint(m.N, rule = finalXMax)
 
 m.contact_order_1 = Constraint(m.N,m.cN,rule=contact_order_1)
@@ -1943,18 +1772,18 @@ Range = np.linspace(0,R,__run_config.num_nodes)
 # Random seed, I'll be fancy later, just a test for now
 m=seed.get_random_seed(m,__run_config)
 
-# if not os.path.exists(__run_config.get_model_path()):
-#     if (__run_config.movement_action == 'walk'):
-#        resource = '3D_col_ros.csv'
-#     elif(__run_config.movement_action == 'step-up-front'):
-#        resource = '3D_col_ros_1.csv'
-#     elif(__run_config.movement_action == 'step-up-hind'):
-#        resource = '3D_col_ros_1.csv'
-#     m=seed.get_initial_seed(m,__run_config, resource)
+#if not os.path.exists(__run_config.get_model_path()):
+#    if (__run_config.movement_action == 'walk'):
+#       resource = '3D_col_ros.csv'
+#    elif(__run_config.movement_action == 'step-up-front'):
+#       resource = '3D_col_ros_1.csv'
+#    elif(__run_config.movement_action == 'step-up-hind'):
+#       resource = '3D_col_ros_1.csv'
+#    m=seed.get_initial_seed(m,__run_config, resource)
 
-# else:
-#     m=seed.get_refined_seed(m,__run_config)
-#     __logger.info(f"Using the refined seed\n completed iterations: {m.iterations_complete}")
+#else:
+#    m=seed.get_refined_seed(m,__run_config)
+#    __logger.info(f"Using the refined seed\n completed iterations: {m.iterations_complete}")
 
 #Steady State
 #--------------------------------------------------------------
