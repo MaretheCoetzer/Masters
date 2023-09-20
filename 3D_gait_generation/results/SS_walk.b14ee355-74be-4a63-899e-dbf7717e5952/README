@@ -1,0 +1,1 @@
+tmax=0.3, tmin = 0.01, bodywidth increased from 0.172 to 0.185, added minimum travel and no max travel constraint, random seeding
