@@ -136,6 +136,31 @@ void setup() {
         Serial.print(servo7_deg);
         Serial.print("        us:");
         Serial.println(servo7);
+
+        Serial.println("10");
+        delay(1000);
+        Serial.println("9");
+        delay(1000);
+        Serial.println("8");
+        delay(1000);
+        Serial.println("7");
+        delay(1000);
+        Serial.println("6");
+        delay(1000);
+        Serial.println("5");
+        delay(1000);
+        Serial.println("4");
+        delay(1000);
+        Serial.println("3");
+        delay(1000);
+        Serial.println("2");
+        delay(1000);
+        Serial.println("1");
+        delay(1000);
+        Serial.println("0");
+        delay(1000);
+
+        
 }
 
 void loop() 
