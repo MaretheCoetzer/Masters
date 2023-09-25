@@ -1,11 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
-get_ipython().run_line_magic('reset', '')
-
 # clears variables in workspace
 # note on resetting:
 # especially while you're debugging, you want to clear your variables between attempts to solve. Why?
@@ -23,7 +18,6 @@ import sympy as sym
 import numpy as np
 import pandas as pd
 sym.init_printing()
-from IPython.display import display #for pretty 
 import log
 
 #plotting
@@ -31,16 +25,15 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as ani
 from IPython.display import HTML
 from matplotlib.animation import PillowWriter
-get_ipython().run_line_magic('matplotlib', 'inline')
 
-gait_name = "ThreeD_SS_2"
-path = "/Users/Marethe/Documents/GitHub/Masters/3D_gait_generation/results/"
+gait_name = "step_up_jup_py_SS_1"
+path = "/home/sheldon/StepUp-main/results/"
 
-logger = log.setup_custom_logger(log_level = "INFO", log_path="C:"+path)
+logger = log.setup_custom_logger(log_level = "INFO", log_path=path)
 logger.info("-------------------------------------------------------")
 logger.info(f"Gait name: {gait_name}")
 logger.info("3D SS walk - initial and final positions the same")
-logger.info("With C matrix")
+logger.info("Without C matrix")
 logger.info(">< body configuration enforced")
 logger.info("Slip and friction implemented as slack variables")
 logger.info("Cost func = return sum(m.h[n] for n in range(1,N+1))/m.q0[N,'x']")
@@ -55,12 +48,6 @@ logger.info("-------------------------------------------------------")
 # create the model
 m = ConcreteModel()
 m.clear()
-
-
-# ## Variables
-
-# In[ ]:
-
 
 #Node Points
 N = 40
@@ -94,8 +81,8 @@ clearance_z = 0.01 #m
 
 pi=np.pi
 
-logger.info(f" m.distance = {m.distance}m, max travel dist*2")
-logger.info(f" stepping height clearance: {clearance_z}m")
+logger.info(f" m.distance = {m.distance}m, max travel dist*4")
+# logger.info(f" stepping height clearance: {clearance_z}m")
 logger.info(f"Nodes = {N}, time variable {tmin}-{tmax}")
 
 
@@ -322,11 +309,11 @@ M=T.jacobian(dq)
 M=M.transpose()
 M=M.jacobian(dq)              
 
-C  = sym.zeros(len(q),len(q))  
-for i in range(len(q)):                                             
-    for j in range(len(q)):
-        for n in range(len(q)):
-            C[i,j] = C[i,j]+ 0.5*(sym.diff(M[i,j],q[n]) + sym.diff(M[i,n],q[j]) - sym.diff(M[j,n],q[i]))*dq[n];
+# C  = sym.zeros(len(q),len(q))  
+# for i in range(len(q)):                                             
+#     for j in range(len(q)):
+#         for n in range(len(q)):
+#             C[i,j] = C[i,j]+ 0.5*(sym.diff(M[i,j],q[n]) + sym.diff(M[i,n],q[j]) - sym.diff(M[j,n],q[i]))*dq[n];
 
 G  = sym.zeros(len(q),1)  
 for i in range(len(q)):
@@ -361,7 +348,7 @@ GRF_3 = J3.transpose()*sym.Matrix([[GRF3x],[GRF3y],[GRF3z]])
 J4=foot4_pos.jacobian(q)
 GRF_4 = J4.transpose()*sym.Matrix([[GRF4x],[GRF4y],[GRF4z]])
 
-EOM=M*ddq+G-Q-GRF_1-GRF_2-GRF_3-GRF_4+C*dq
+EOM=M*ddq+G-Q-GRF_1-GRF_2-GRF_3-GRF_4#+C*dq
 
 EOMs = sym.zeros(len(q),1)
 EOMcounter = 0
@@ -514,16 +501,6 @@ m.infxy = m.m[('femur',1)]*m.l[('femur',1)]**2/12
 m.intxy = m.m[('tibia',1)]*m.l[('tibia',1)]**2/12
 m.infz = m.m[('femur',1)]*m.l[('legRadius',1)]**2/2
 m.intz = m.m[('tibia',1)]*m.l[('legRadius',1)]**2/2
-    
-    
-    #CALLEN: maybe print out the inertia values and see if they are reasonable values
-    
-    
-print("Done")
-
-
-# In[ ]:
-
 
 def ContConstraint_p (m, n, dof):
     if n > 1:
@@ -545,9 +522,6 @@ def ContConstraint_tt (m, n):
     else:
         return Constraint.Skip
 m.ContConstraint_tt = Constraint(m.N, rule = ContConstraint_tt)
-
-print('Done')
-
 
 # In[ ]:
 
@@ -579,8 +553,6 @@ m.integrate_tt = Constraint(m.N, m.cN, rule = integrate_tt)
 
 print('Done')
 
-
-# In[ ]:
 
 
 signs = ['ps', 'ng']
@@ -738,26 +710,26 @@ stairs_4=np.zeros(N+1)
 #         return Constraint.Skip
 # m.foot_1_step_min = Constraint(m.N, m.cN, rule = step_1_min)
 
-def step_1_height(m,n,c):       
-    var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
-                    m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
-                    m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
-                    m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
-                    m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
-                    m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
-                    m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
-                    m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
-                    m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
-                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    if (n<2):
-        return lamb_foot1z(*var_list) <=stairs_1[n]+0.01
-    if (n==N/8):
-        return lamb_foot1z(*var_list) >=stairs_1[n]+clearance_z
-    if (n>=2*N/8):
-        return lamb_foot1z(*var_list) <=stairs_1[n]+0.01
-    else:
-        return Constraint.Skip
-m.step_1_height = Constraint(m.N, m.cN, rule = step_1_height)
+# def step_1_height(m,n,c):       
+#     var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
+#                     m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
+#                     m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
+#                     m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
+#                     m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
+#                     m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
+#                     m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
+#                     m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
+#                     m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
+#                     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+#     if (n<2):
+#         return lamb_foot1z(*var_list) <=stairs_1[n]+0.01
+#     if (n==N/8):
+#         return lamb_foot1z(*var_list) >=stairs_1[n]+clearance_z
+#     if (n>=2*N/8):
+#         return lamb_foot1z(*var_list) <=stairs_1[n]+0.01
+#     else:
+#         return Constraint.Skip
+# m.step_1_height = Constraint(m.N, m.cN, rule = step_1_height)
 
 
 # -----------------Foot 2-------------------------------
@@ -799,69 +771,69 @@ m.step_1_height = Constraint(m.N, m.cN, rule = step_1_height)
 #         return Constraint.Skip
 # m.foot_2_step_min = Constraint(m.N, m.cN, rule = step_2_min)
 
-def step_2_height(m,n,c):       
-    var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
-                    m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
-                    m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
-                    m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
-                    m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
-                    m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
-                    m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
-                    m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
-                    m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
-                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    if (n<4*N/8):
-        return lamb_foot2z(*var_list) <=stairs_2[n]+0.01
-    if (n==5*N/8):
-        return lamb_foot2z(*var_list) >=stairs_2[n]+clearance_z
-    if (n>=6*N/8):
-        return lamb_foot2z(*var_list) <=stairs_2[n]+0.01
-    else:
-        return Constraint.Skip
-m.step_2_height = Constraint(m.N, m.cN, rule = step_2_height)
+# def step_2_height(m,n,c):       
+#     var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
+#                     m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
+#                     m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
+#                     m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
+#                     m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
+#                     m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
+#                     m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
+#                     m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
+#                     m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
+#                     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+#     if (n<4*N/8):
+#         return lamb_foot2z(*var_list) <=stairs_2[n]+0.01
+#     if (n==5*N/8):
+#         return lamb_foot2z(*var_list) >=stairs_2[n]+clearance_z
+#     if (n>=6*N/8):
+#         return lamb_foot2z(*var_list) <=stairs_2[n]+0.01
+#     else:
+#         return Constraint.Skip
+# m.step_2_height = Constraint(m.N, m.cN, rule = step_2_height)
 
 
-def step_3_height(m,n,c):       
-    var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
-                    m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
-                    m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
-                    m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
-                    m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
-                    m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
-                    m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
-                    m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
-                    m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
-                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    if (n<6*N/8):
-        return lamb_foot3z(*var_list) <=stairs_3[n]+0.01
-    if (n>=(7*N/8-N/8/2) and n<=(7*N/8+N/8/2)):
-        return lamb_foot3z(*var_list) >=stairs_3[n]+clearance_z
-    if (n==8*N/8):
-        return lamb_foot3z(*var_list) <=stairs_3[n]+0.01
-    else:
-        return Constraint.Skip
-m.step_3_height = Constraint(m.N, m.cN, rule = step_3_height)
+# def step_3_height(m,n,c):       
+#     var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
+#                     m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
+#                     m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
+#                     m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
+#                     m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
+#                     m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
+#                     m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
+#                     m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
+#                     m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
+#                     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+#     if (n<6*N/8):
+#         return lamb_foot3z(*var_list) <=stairs_3[n]+0.01
+#     if (n==7*N/8):
+#         return lamb_foot3z(*var_list) >=stairs_3[n]+clearance_z
+#     if (n==8*N/8):
+#         return lamb_foot3z(*var_list) <=stairs_3[n]+0.01
+#     else:
+#         return Constraint.Skip
+# m.step_3_height = Constraint(m.N, m.cN, rule = step_3_height)
 
-def step_4_height(m,n,c):       
-    var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
-                    m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
-                    m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
-                    m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
-                    m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
-                    m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
-                    m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
-                    m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
-                    m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
-                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    if (n<=2*N/8):
-        return lamb_foot4z(*var_list) <=stairs_4[n]+0.01
-    if ((n>=3*N/8-N/8/2) and n<=(3*N/8+N/8/2)):
-        return lamb_foot4z(*var_list) >=stairs_4[n]+clearance_z
-    if (n>=4*N/8):
-        return lamb_foot4z(*var_list) <=stairs_4[n]+0.01
-    else:
-        return Constraint.Skip
-m.step_4_height = Constraint(m.N, m.cN, rule = step_4_height)
+# def step_4_height(m,n,c):       
+#     var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
+#                     m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
+#                     m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
+#                     m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
+#                     m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
+#                     m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
+#                     m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
+#                     m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
+#                     m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
+#                     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+#     if (n<=2*N/8):
+#         return lamb_foot4z(*var_list) <=stairs_4[n]+0.01
+#     if (n==3*N/8):
+#         return lamb_foot4z(*var_list) >=stairs_4[n]+clearance_z
+#     if (n>=4*N/8):
+#         return lamb_foot4z(*var_list) <=stairs_4[n]+0.01
+#     else:
+#         return Constraint.Skip
+# m.step_4_height = Constraint(m.N, m.cN, rule = step_4_height)
 
 # _____________________________________________________________________________________
 # def contact_order_1(m,n,c):
@@ -887,277 +859,6 @@ m.step_4_height = Constraint(m.N, m.cN, rule = step_4_height)
 # def contact_order_4(m,n,c):
 #     return m.GRF4[n,c,'Z','ps'] >=5 
 # m.contact_order_4 = Constraint(m.N,m.cN,rule=contact_order_4)
-
-
-# In[ ]:
-
-
-# # CALLENS CODE TO MAKE THE STEP UP
-# step_length=0.15      #FAR TOO LONG I RATE
-# distance_from_step=BodyLength/2+0.02   #BodyLength=0.335 m
-# stair_height=0.05
-
-# # force robot to achieve distance of 2 cm half way through the trajectory (should have foot above step at this point)
-# # force robot to achieve distance of 4 cm at end of the trajectory (should have foot on step at this point)
-# def midXMin(m,n):
-#     if (n==N/2) :
-#         return m.q0[n,'x'] >= 0.02
-#     if (n==N) :
-#         return m.q0[n,'x'] >= 0.04
-#     return Constraint.Skip
-# m.midXMin = Constraint(m.N, rule = midXMin)
-
-
-
-
-
-# #FIRST LEFT STEP UP
-# def step_mid_height(m,n,c):       
-#     var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
-#                     m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
-#                     m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
-#                     m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
-#                     m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
-#                     m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
-#                     m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
-#                     m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
-#                     m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
-#                     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-#     if (n<2):
-#         return lamb_foot2z(*var_list) <=0.01
-#     if (n==N/4):
-#         return lamb_foot2z(*var_list) >=1.5*stair_height
-#     if (n==N/2):
-#         return lamb_foot2z(*var_list) <=stair_height+0.01
-#     return Constraint.Skip
-# m.step_mid_height = Constraint(m.N, m.cN, rule = step_mid_height)
-
-# def step_mid_distance(m,n,c):       
-#     var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
-#                     m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
-#                     m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
-#                     m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
-#                     m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
-#                     m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
-#                     m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
-#                     m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
-#                     m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
-#                     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-#     if (n==N/4):
-#         return lamb_foot2x(*var_list) >=distance_from_step
-#     if (n==N/2):
-#         return lamb_foot2x(*var_list) >=distance_from_step+0.03
-#     return Constraint.Skip
-# m.step_mid_distance = Constraint(m.N, m.cN, rule = step_mid_distance)
-
-
-
-
-# #SECOND STEP UP
-# def step_mid_height_2(m,n,c):       
-#     var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
-#                     m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
-#                     m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
-#                     m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
-#                     m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
-#                     m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
-#                     m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
-#                     m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
-#                     m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
-#                     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-#     if (n<N/2):
-#         return lamb_foot1z(*var_list) <=0.01
-#     if (n==3*N/4):
-#         return lamb_foot1z(*var_list) >=1.5*stair_height
-#     if (n==N):
-#         return lamb_foot1z(*var_list) <=stair_height+0.01
-#     return Constraint.Skip
-# m.step_mid_height_2 = Constraint(m.N, m.cN, rule = step_mid_height_2)
-
-# def step_mid_distance_2(m,n,c):       
-#     var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
-#                     m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
-#                     m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
-#                     m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
-#                     m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
-#                     m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
-#                     m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
-#                     m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
-#                     m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
-#                     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-#     if (n==3*N/4):
-#         return lamb_foot1x(*var_list) >=distance_from_step
-#     if (n==N):
-#         return lamb_foot1x(*var_list) >=distance_from_step+0.03
-#     return Constraint.Skip
-# m.step_mid_distance_2 = Constraint(m.N, m.cN, rule = step_mid_distance_2)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# # force other feet to stay on the ground
-# # def contact_order_1(m,n,c):
-# #     if (n<N/2):
-# #         return m.GRF1[n,c,'Z','ps'] >=5 
-# #     return Constraint.Skip
-# # m.contact_order_1 = Constraint(m.N,m.cN,rule=contact_order_1)
-# # def contact_order_2(m,n,c):
-# #     if (n>N/2):
-# #         return m.GRF2[n,c,'Z','ps'] >=5 
-# #     return Constraint.Skip
-# # m.contact_order_2 = Constraint(m.N,m.cN,rule=contact_order_2)
-
-# def contact_order_3(m,n,c):
-#     return m.GRF3[n,c,'Z','ps'] >=5 
-# m.contact_order_3 = Constraint(m.N,m.cN,rule=contact_order_3)
-# def contact_order_4(m,n,c):
-#     return m.GRF4[n,c,'Z','ps'] >=5 
-# m.contact_order_4 = Constraint(m.N,m.cN,rule=contact_order_4)
-
-
-# # define the vectors for the contact model
-# stairs_1=np.zeros(N+1)
-# stairs_2=np.zeros(N+1)
-# stairs_3=np.zeros(N+1)
-# stairs_4=np.zeros(N+1)
-
-# for i in range(N+1):
-#     if i>N/4:
-#         stairs_2[i]=stair_height
-#     if i>3*N/4:
-#         stairs_1[i]=stair_height
-
-# print('Done')
-
-
-# In[ ]:
-
-
-#step_length=0.15
-#distance_from_step=BodyLength/2+0.02   #BodyLength=0.335 m
-
-#stair_height=0.05
-#stairs_1=np.zeros(N+1)
-#stairs_2=np.zeros(N+1)
-#stairs_3=np.zeros(N+1)
-#stairs_4=np.zeros(N+1)
-
-#for i in range(N+1):
-#     if i>(segment_nodes*1):
-#         stairs_1[i]=stair_height
-#    if i>9:
-#        stairs_2[i]=stair_height
-#     if i>35:
-#         stairs_3[i]=stair_height
-#     if i>55:
-#         stairs_4[i]=stair_height
-
-
-
-
-
-
-
-
-
-
-
-
-
-# In[ ]:
-
-
-# ------------FOOT POSITIONS----------------------------
-# -----------------Foot 1-------------------------------
-#def step_1_max(m,n,c):       
-#    var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
-#                    m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
-#                    m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
-#                    m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
-#                    m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
-#                    m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
-#                    m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
-#                    m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
-#                    m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
-#                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-#    if (n<segment_nodes*2):
-#        return lamb_foot1x(*var_list) <=distance_from_step+0.02
-#    else:
-#        return Constraint.Skip
-#m.foot_1_step_max = Constraint(m.N, m.cN, rule = step_1_max)
-
-#def step_2_max(m,n,c):       
-#    var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
-#                    m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
-#                    m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
-#                    m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
-#                    m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
-#                    m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
-#                    m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
-#                    m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
-#                    m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
-#                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-#    if (n>15):
-#        return lamb_foot2x(*var_list) <=distance_from_step+step_length
-#    elif (n<5):
-#        return lamb_foot2x(*var_list) <=distance_from_step
-#    else:
-#        return Constraint.Skip
-#m.foot_2_step_max = Constraint(m.N, m.cN, rule = step_2_max)
-
-#def step_2_min(m,n,c):       
-#    var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
-#                    m.l[('body',1)],m.l[('femur',1)],m.l[('tibia',1)],m.l[('femur',2)],m.l[('tibia',2)],m.l[('femur',3)],m.l[('tibia',3)],m.l[('femur',4)],m.l[('tibia',4)],m.l[('bodyWidth',1)],m.l[('legRadius',1)],
-#                    m.inbx,m.inby,m.inbz,m.infxy,m.intxy,m.infz,m.intz,
-#                    m.q[n,c,'x'],m.q[n,c,'y'],m.q[n,c,'z'],m.q[n,c,'theta_bx'],m.q[n,c,'theta_by'],m.q[n,c,'theta_bz'],m.q[n,c,'theta_h1'],m.q[n,c,'theta_k1'],m.q[n,c,'theta_h2'],m.q[n,c,'theta_k2'],
-#                    m.q[n,c,'theta_h3'],m.q[n,c,'theta_k3'],m.q[n,c,'theta_h4'],m.q[n,c,'theta_k4'],
-#                    m.dq[n,c,'x'],m.dq[n,c,'y'],m.dq[n,c,'z'],m.dq[n,c,'theta_bx'],m.dq[n,c,'theta_by'],m.dq[n,c,'theta_bz'],m.dq[n,c,'theta_h1'],m.dq[n,c,'theta_k1'],m.dq[n,c,'theta_h2'],m.dq[n,c,'theta_k2'],
-#                    m.dq[n,c,'theta_h3'],m.dq[n,c,'theta_k3'],m.dq[n,c,'theta_h4'],m.dq[n,c,'theta_k4'],
-#                    m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
-#                    m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
-#                    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-#    if (n>15):
-#        return lamb_foot2x(*var_list) >=distance_from_step
-#    else:
-#        return Constraint.Skip
-#m.foot_2_step_min = Constraint(m.N, m.cN, rule = step_2_min)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# In[ ]:
 
 
 # # CONTACTS
@@ -1267,11 +968,6 @@ def def_contact_4_pr(m,n):
     return a_contact_4_pr*b_contact_4_pr <= m.eps
 m.def_contact_4_pr = Constraint(m.N, rule = def_contact_4_pr)
 
-print('Done')
-
-
-# In[ ]:
-
 
 # FRICTION CONE
 # Leg 1 -------------------------------------------------------------------------------------------------------------
@@ -1295,9 +991,6 @@ def def_a_friction_4(m,n,c):
 m.def_a_friction_4 = Constraint(m.N, m.cN, rule = def_a_friction_4)
 
 
-print('Done')
-
-
 # In[ ]:
 
 
@@ -1312,7 +1005,7 @@ def def_F1_x(m,n,c):
                     m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
                     m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
                     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    return  m.GRF1[n,c,'Z','ps']*lamb_foot1dx(*var_list)*lamb_foot1dx(*var_list)<= m.eps/1
+    return  m.GRF1[n,c,'Z','ps']*lamb_foot1dx(*var_list)*lamb_foot1dx(*var_list)<= m.eps/10
 m.def_F1_x = Constraint(m.N, m.cN, rule = def_F1_x)
 def def_F1_y(m,n,c):   
     var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
@@ -1325,12 +1018,12 @@ def def_F1_y(m,n,c):
                     m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
                     m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
                     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    return  m.GRF1[n,c,'Z','ps']*lamb_foot1dy(*var_list)*lamb_foot1dy(*var_list)<= m.eps/1
+    return  m.GRF1[n,c,'Z','ps']*lamb_foot1dy(*var_list)*lamb_foot1dy(*var_list)<= m.eps/10
 m.def_F1_y = Constraint(m.N, m.cN, rule = def_F1_y)
 
 
 
-
+logger.info("m.GRF1[n,c,'Z','ps']*lamb_foot1dx(*var_list)*lamb_foot1dx(*var_list)<= m.eps/10")
 
 
 def def_F2_x(m,n,c):   
@@ -1344,7 +1037,7 @@ def def_F2_x(m,n,c):
                     m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
                     m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
                     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    return  m.GRF2[n,c,'Z','ps']*lamb_foot2dx(*var_list)*lamb_foot2dx(*var_list)<= m.eps/1
+    return  m.GRF2[n,c,'Z','ps']*lamb_foot2dx(*var_list)*lamb_foot2dx(*var_list)<= m.eps/10
 m.def_F2_x = Constraint(m.N, m.cN, rule = def_F2_x)
 def def_F2_y(m,n,c):   
     var_list = [m.g,m.m[('body',1)],m.m[('femur',1)],m.m[('tibia',1)],m.m[('femur',2)],m.m[('tibia',2)],m.m[('femur',3)],m.m[('tibia',3)],m.m[('femur',4)],m.m[('tibia',4)],
@@ -1357,7 +1050,7 @@ def def_F2_y(m,n,c):
                     m.ddq[n,c,'x'],m.ddq[n,c,'y'],m.ddq[n,c,'z'],m.ddq[n,c,'theta_bx'],m.ddq[n,c,'theta_by'],m.ddq[n,c,'theta_bz'],m.ddq[n,c,'theta_h1'],m.ddq[n,c,'theta_k1'],m.ddq[n,c,'theta_h2'],m.ddq[n,c,'theta_k2'],
                     m.ddq[n,c,'theta_h3'],m.ddq[n,c,'theta_k3'],m.ddq[n,c,'theta_h4'],m.ddq[n,c,'theta_k4'],
                     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    return  m.GRF2[n,c,'Z','ps']*lamb_foot2dy(*var_list)*lamb_foot2dy(*var_list)<= m.eps/1
+    return  m.GRF2[n,c,'Z','ps']*lamb_foot2dy(*var_list)*lamb_foot2dy(*var_list)<= m.eps/10
 m.def_F2_y = Constraint(m.N, m.cN, rule = def_F2_y)
 
 
@@ -1419,11 +1112,6 @@ def def_F4_y(m,n,c):
                     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     return  m.GRF4[n,c,'Z','ps']*lamb_foot4dy(*var_list)*lamb_foot4dy(*var_list)<= m.eps/1
 m.def_F4_y = Constraint(m.N, m.cN, rule = def_F4_y)
-
-print('Done')
-
-
-# In[ ]:
 
 
 m.tau_h1 = Var(m.N, bounds = (-m.Tmax,m.Tmax)) # actuator torque at hip_1
@@ -1494,14 +1182,6 @@ m.def_knee4_motor_model_p = Constraint(m.N, rule = def_knee4_motor_model_p)
 def def_knee4_motor_model_n(m,n):
     return  m.tau_k4[n] >= -m.Tmax-m.Tmax/m.Wmax*(m.dq0[n,'theta_k4']-m.dq0[n,'theta_h4'])
 m.def_knee4_motor_model_n = Constraint(m.N, rule = def_knee4_motor_model_n)
-
-print('Done')
-
-
-# In[ ]:
-
-
-#CALLEN: simplified the substitution for the below functions, trying to speed up the optimizer 
 
 
 def EOM_x(m,n,c):
@@ -1840,11 +1520,6 @@ def EOM_th_k4(m,n,c):
     return lambEOM_th_k4(*var_list) == 0
 m.EOM_th_k4 = Constraint(m.N, m.cN, rule = EOM_th_k4)
 
-print('Done')
-
-
-# In[ ]:
-
 
 def setxBounds(m,n):
     return (-1.0, m.q0[n,'x'], m.distance+1)
@@ -1865,10 +1540,6 @@ def setth_bz_Bounds(m,n):
     return (-0.785, m.q0[n,'theta_bz'], 0.785)
 m.setth_bz_Bounds = Constraint(m.N, rule=setth_bz_Bounds)
 
-
-
-
-    #CALLEN changed-> made them larger to give wiggle room, they were +-1, but change them to the correct values
 def setth_h1_Bounds(m,n):
     return (-1.5, m.q0[n,'theta_h1'],1.5)
 m.setth_h1_Bounds = Constraint(m.N, rule=setth_h1_Bounds)
@@ -1937,11 +1608,6 @@ def setdth_k4_Bounds(m,n):
     return (-4*m.Wmax, m.dq0[n,'theta_k4'], 4*m.Wmax)
 m.setdth_k4_Bounds = Constraint(m.N, rule=setdth_k4_Bounds)
 
-print('Done')
-
-
-# In[ ]:
-
 
 #Relative Knee Angle Constraints
 #Knee 1
@@ -1980,13 +1646,8 @@ def th_h4_constraint(m,n):
     return m.q0[n,'theta_h4'] <= 30/180*pi
 m.th_h4_constraint = Constraint(m.N, rule = th_h4_constraint)
 
-print('Done')
 
-
-# In[ ]:
-
-
-movement = pd.read_csv(r'C:\Users\Marethe\OneDrive\Masters_2.0\Quad_simulations\3D\Mine8\3D_col_ros.csv')
+movement = pd.read_csv(r'/home/sheldon/StepUp-main/resources/3D_col_ros.csv')
 end = movement.iloc[0,:] 
 print(end)
 
@@ -2034,11 +1695,6 @@ for n in range(1,N+1):
         m.GRF4[n,c,'X','ps'].value = 0.01 
         m.GRF4[n,c,'X','ng'].value = 0.01
         
-print('Done')
-
-
-# In[ ]:
-
 
 #---------WALKING GAIT MOVING ONE LEG AT A TIME-----------
 #Enforce contact order 
@@ -2242,7 +1898,7 @@ m.finalXMin = Constraint(m.N, rule = finalXMin)
 
 def finalXMax(m,n):
     if (n==N) :
-        return m.q0[n,'x'] <= m.distance*2
+        return m.q0[n,'x'] <= m.distance*4
     else:
         return Constraint.Skip
 m.finalXMax = Constraint(m.N, rule = finalXMax)
@@ -2338,82 +1994,6 @@ def finalthk4(m,n):
         return Constraint.Skip
 m.finalthk4 = Constraint(m.N, rule = finalthk4)
 
-# # Final Velocities
-# def finaldX(m,n):
-#     if (n==N) :
-#         return m.dq0[n,'x'] == m.dq0[1,'x']
-#     else:
-#         return Constraint.Skip
-# m.finaldX = Constraint(m.N, rule = finaldX)
-
-# def finaldZ(m,n):
-#     if (n==N) :
-#         return m.dq0[n,'z'] == m.dq0[1,'z']
-#     else:
-#         return Constraint.Skip
-# m.finaldZ = Constraint(m.N, rule = finaldZ)
-
-# def finaldthh1(m,n):
-#     if (n==N) :
-#         return m.dq0[n,'theta_h1'] == m.dq0[1,'theta_h1']
-#     else:
-#         return Constraint.Skip
-# m.finaldthh1 = Constraint(m.N, rule = finaldthh1)
-
-# def finaldthk1(m,n):
-#     if (n==N) :
-#         return m.dq0[n,'theta_k1'] == m.dq0[1,'theta_k1']
-#     else:
-#         return Constraint.Skip
-# m.finaldthk1 = Constraint(m.N, rule = finaldthk1)
-
-# def finaldthh2(m,n):
-#     if (n==N) :
-#         return m.dq0[n,'theta_h2'] == m.dq0[1,'theta_h2']
-#     else:
-#         return Constraint.Skip
-# m.finaldthh2 = Constraint(m.N, rule = finaldthh2)
-
-# def finaldthk2(m,n):
-#     if (n==N) :
-#         return m.dq0[n,'theta_k2'] == m.dq0[1,'theta_k2']
-#     else:
-#         return Constraint.Skip
-# m.finaldthk2 = Constraint(m.N, rule = finaldthk2)
-
-# def finaldthh3(m,n):
-#     if (n==N) :
-#         return m.dq0[n,'theta_h3'] == m.dq0[1,'theta_h3']
-#     else:
-#         return Constraint.Skip
-# m.finaldthh3 = Constraint(m.N, rule = finaldthh3)
-
-# def finaldthk3(m,n):
-#     if (n==N) :
-#         return m.dq0[n,'theta_k3'] == m.dq0[1,'theta_k3']
-#     else:
-#         return Constraint.Skip
-# m.finaldthk3 = Constraint(m.N, rule = finaldthk3)
-
-# def finaldthh4(m,n):
-#     if (n==N) :
-#         return m.dq0[n,'theta_h4'] == m.dq0[1,'theta_h4']
-#     else:
-#         return Constraint.Skip
-# m.finaldthh4 = Constraint(m.N, rule = finaldthh4)
-
-# def finaldthk4(m,n):
-#     if (n==N) :
-#         return m.dq0[n,'theta_k4'] == m.dq0[1,'theta_k4']
-#     else:
-#         return Constraint.Skip
-# m.finaldthk4 = Constraint(m.N, rule = finaldthk4)
-
-print('Done')
-
-
-# In[ ]:
-
 
 # opt = SolverFactory('ipopt') # standard issue, garden variety ipopt
 opt = SolverFactory('ipopt')#, executable=r"C:\Users\maret\anaconda3\pkgs\ipopt-3.11.1-2\Library\bin\ipopt.exe")
@@ -2452,8 +2032,8 @@ for i in range(0,5):
 # In[ ]:
 
 
-print(results.solver.status) 
-print(results.solver.termination_condition) 
+logger.info(results.solver.status) 
+logger.info(results.solver.termination_condition) 
 
 # Plotting the stuff --------------------------------------------------
 # fig, axs = plt.subplots(5)
@@ -2675,7 +2255,7 @@ update = lambda i: plot_robot(i,m,ax1) #lambdify update function
 
 animate = ani.FuncAnimation(fig1,update,range(1,N+1),interval = m.h[i-1].value*hm*10000,repeat=False)
 # m.h[i].value*hm*100000
-animate.save(r'C:'+path+'3D_Quad.gif', writer='PillowWriter', fps=10)
+animate.save(path+'3D_Quad.gif', writer='PillowWriter', fps=10)
 
 HTML(animate.to_jshtml())
 
@@ -2775,7 +2355,7 @@ update = lambda i: plot_robot(i,m,ax2) #lambdify update function
 
 animate = ani.FuncAnimation(fig2,update,range(1,N+1),interval = m.h[i].value*hm*10000,repeat=False)
 # m.h[i].value*hm*100000
-animate.save(r'C:'+path+'XZ_Quad.gif', writer='PillowWriter', fps=10)
+animate.save(path+'XZ_Quad.gif', writer='PillowWriter', fps=10)
 
 HTML(animate.to_jshtml())
 # print(f"BodyLength/2+distance_from_Step = {BodyLength/2+distance_from_step}")
@@ -2873,9 +2453,6 @@ animate = ani.FuncAnimation(fig3,update,range(1,N+1),interval = m.h[i].value*hm*
 HTML(animate.to_jshtml())
 
 
-# In[ ]:
-
-
 foot1x = np.array([])
 foot1y = np.array([])
 foot1z = np.array([])
@@ -2954,13 +2531,13 @@ properties = {'N':[N],'Body Mass':[m.m[('body',1)]],'Femur 1 Mass':[m.m[('femur'
                                     'Body Length':[m.l[('body',1)]],'Body Width':[m.l[('bodyWidth',1)]],'Femur 1 Length':[m.l[('femur',1)]],'Tibia 1 Length':[m.l[('tibia',1)]],'Femur 2 Length':[m.l[('femur',2)]],'Tibia 2 Length':[m.l[('tibia',2)]],
                                     'Femur 3 Length':[m.l[('femur',3)]],'Tibia 3 Length':[m.l[('tibia',3)]],'Femur 4 Length':[m.l[('femur',4)]],'Tibia 4 Length':[m.l[('tibia',4)]]}
 Properties = pd.DataFrame(properties)
-Properties.to_csv (r'C:'+path+'3D_Properties.csv', index = False, header=True)
+Properties.to_csv (path+'3D_Properties.csv', index = False, header=True)
 
 #Torques, node time steps ------------------------------------------------------------------------------------------------------------
 torques = {'Node timesteps':[m.h[n].value for n in range (1, N+1)],'Torque Hip 1':[m.tau_h1[n].value for n in range (1, N+1)],'Torque Knee 1':[m.tau_k1[n].value for n in range (1, N+1)],'Torque Hip 2':[m.tau_h2[n].value for n in range (1, N+1)],'Torque Knee 2':[m.tau_k2[n].value for n in range (1, N+1)],
                                     'Torque Hip 3':[m.tau_h3[n].value for n in range (1, N+1)],'Torque Knee 3':[m.tau_k3[n].value for n in range (1, N+1)],'Torque Hip 4':[m.tau_h4[n].value for n in range (1, N+1)],'Torque Knee 4':[m.tau_k4[n].value for n in range (1, N+1)]}
 Torques = pd.DataFrame(torques)
-Torques.to_csv (r'C:'+path+'3D_Nodal.csv', index = False, header=True)
+Torques.to_csv (path+'3D_Nodal.csv', index = False, header=True)
 
 #Trajectories per collocation point - Angles, Velocities and GRFs - unaltered ----------------------------------------------------------------------------------------
 qx = [0 for x in range(N*3)]
@@ -3061,7 +2638,7 @@ movement_traj = {'X Position':[qx[i] for i in range (len(qx))],'Y Position':[qy[
            'GRF 1z':[grf1z[i] for i in range (len(grf1z))],'GRF 2z':[grf2z[i] for i in range (len(grf2z))],'GRF 3z':[grf3z[i] for i in range (len(grf3z))],'GRF 4z':[grf4z[i] for i in range (len(grf4z))]}
 
 Movement_traj = pd.DataFrame(movement_traj)
-Movement_traj.to_csv (r'C:'+path+'3D_col_traj.csv', index = False, header=True)
+Movement_traj.to_csv (path+'3D_col_traj.csv', index = False, header=True)
 
 #ROS trajectories per collocation point  - Angles, Velocities and GRFs - altered ----------------------------------------------------------------------------------------
 r_qx = [0 for x in range(N*3)]
@@ -3109,7 +2686,7 @@ movement_ros = {'X Position':[r_qx[i] for i in range (len(r_qx))],'Y Position':[
            'Hip 3 Angle':[r_qh3[i] for i in range (len(r_qh3))],'Knee 3 Angle':[r_qk3[i] for i in range (len(r_qk3))],'Hip 4 Angle':[r_qh4[i] for i in range (len(r_qh4))],'Knee 4 Angle':[r_qk4[i] for i in range (len(r_qk4))],'m.tt':[t_new[i] for i in range (len(t))]}
 
 Movement_ros = pd.DataFrame(movement_ros)
-Movement_ros.to_csv (r'C:'+path+'3D_col_ros.csv', index = False, header=True)
+Movement_ros.to_csv (path+'3D_col_ros.csv', index = False, header=True)
 
 print('done')
 
