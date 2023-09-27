@@ -162,15 +162,17 @@ def Interpolater(joint,t,step):
 [SS_H4,ss_t] = Interpolater(th_h4,t,step)
 [SS_K4,ss_t] = Interpolater(th_k4,t,step)
 
-ss_h1=SS_H1-SS_BY
-ss_h2=SS_H2-SS_BY
-ss_h3=SS_H3-SS_BY
-ss_h4=SS_H4-SS_BY
+print(f"SS_BY[0]={SS_BY[0]}")
 
-ss_k1=SS_K1-SS_H1
-ss_k2=SS_K2-SS_H2
-ss_k3=SS_K3-SS_H3
-ss_k4=SS_K4-SS_H4
+ss_h1=(SS_H1)*-1
+ss_h2=(SS_H2)*-1
+ss_h3=(SS_H3)*-1
+ss_h4=(SS_H4)*-1
+
+ss_k1=(SS_K1)*-1
+ss_k2=(SS_K2)*-1
+ss_k3=(SS_K3)*-1
+ss_k4=(SS_K4)*-1
 
 # plt.plot(ss_t,SS_H1,t,th_h1)
 # plt.title('Hip 1 linearised vs trajectory joint angles')
@@ -193,7 +195,6 @@ print(f"hip[0]: {th_h1[0]}, t[0]: {t[0]}, hip[N]: {th_h1[len(th_h1)-1]}, t[N]: {
 
 np.set_string_function(lambda x: repr(x).replace('(', '').replace(')', '').replace('array', '').replace("       ", ' ').replace('[','{').replace(']','}').replace('\n','') , repr=False)
 print(f'float SS_servo0[] = {ss_h1};\nfloat SS_servo1[] = {ss_k1};\nfloat SS_servo2[] = {ss_h2};\nfloat SS_servo3[] = {ss_k2};\nfloat SS_servo4[] = {ss_h3};\nfloat SS_servo5[] = {ss_k3};\nfloat SS_servo6[] = {ss_h4};\nfloat SS_servo7[] = {ss_k4};')
-
 
 # ________________________________________Torque Plots________________________________________
 # f, axs = plt.subplots(2) #create axes
@@ -338,14 +339,14 @@ fig1, ax1 = plt.subplots(1,1) #create axes
 #ax1.set_aspect('equal')       
 update = lambda i: plot_robot(i,ax1) #lambdify update function
 
-animate = ani.FuncAnimation(fig1,update,range(0,len(SS_H1)),interval = 50,repeat=False)
-animate.save(path+"..\..\post_processing\image_sorting\\"+trajectory_name+".gif", writer='PillowWriter', fps=10)
-HTML(animate.to_jshtml())
+# animate = ani.FuncAnimation(fig1,update,range(0,len(SS_H1)),interval = 50,repeat=False)
+# animate.save(path+"..\..\post_processing\image_sorting\\"+trajectory_name+".gif", writer='PillowWriter', fps=10)
+# HTML(animate.to_jshtml())
 
 # _____________________________________Stills of linearised gaits________________________________________________
 # Creates still_nr equally spaced still images of the gait
 still_nr = 20
-sequence = np.array([0,11,28,68,90,108])
+sequence = np.array([0,28,39,73,96,108])
 step=range(len(sequence))
 
 fig2, ax2 = plt.subplots(1,1)
@@ -354,9 +355,13 @@ for i in np.linspace(0,len(SS_H1)-1,still_nr):
     plt.title({int(i)})
     plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_"+str(int(i))+".png", transparent=True, bbox_inches='tight') #bbox_inches is used to remove excess white around figure
 
-fig3, ax3 = plt.subplots(1,1)    
-for g in step:
-    plot_robot_sequence(sequence[g],ax3,step[g])
-plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_cascade.png", transparent=True, bbox_inches='tight',dpi=500) #bbox_inches is used to remove excess white around figure, dpi(dots per inch) image quality
+# fig3, ax3 = plt.subplots(1,1)    
+# for g in step:
+#     plot_robot_sequence(sequence[g],ax3,step[g])
+# plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_cascade.png", transparent=True, bbox_inches='tight',dpi=500) #bbox_inches is used to remove excess white around figure, dpi(dots per inch) image quality
 
-
+angles = {'Node':[sequence[i] for i in range(len(sequence))], 'Body':[SS_BY[i]/np.pi*180 for i in sequence], 'Motor 1':[SS_H1[i]/np.pi*180 for i in sequence],'Motor 2':[SS_K1[i]/np.pi*180 for i in sequence],'Motor 3':[SS_H2[i]/np.pi*180 for i in sequence],'Motor 4':[SS_K2[i]/np.pi*180 for i in sequence],
+          'Motor 5':[SS_H3[i]/np.pi*180 for i in sequence],'Motor 6':[SS_K3[i]/np.pi*180 for i in sequence],'Motor 7':[SS_H4[i]/np.pi*180 for i in sequence],'Motor 8':[SS_K4[i]/np.pi*180 for i in sequence]}
+angles = pd.DataFrame(angles)
+print(f" Trajectory Angles:\n {angles}")
+angles.to_csv(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_selected_angles.csv", index = False, header=True)
