@@ -1,5 +1,10 @@
+// HOW TO:
+// ------------------------------
+// Serial input = 2 -> Steps through gait sequence once and stops at the end.
+// Serial input = 1 -> Steps through gait sequence in a loop.
+// Serial input = 0 -> Stops infinite loop at the node where it is at that moment
+
 //Gait template
-//FIRST STEP OF LEG 1 MODIFIED
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
 
@@ -15,6 +20,9 @@ Adafruit_PWMServoDriver pca9685 = Adafruit_PWMServoDriver();
 #define SER6 6 //Hip 4
 #define SER7 7 //Knee 4
 
+// Insert servo angles here:
+// For 3D gaits, these angles are obtained from linearisation.py
+// For 2D gaits, these angles are obtained from 2D_trajectory_reader.py
 float SS_servo0[] = {-0.19868828, -0.18974597, -0.18727953, -0.18301514, -0.16997153, -0.15589857, -0.1418256 , -0.12701444, -0.11196618, -0.09691791, -0.08186964, -0.06682138, -0.05177311, -0.03672484, -0.02167658, -0.00662831,  0.00804551,  0.01810785,  0.02817018,  0.03823252,  0.04829485,  0.05835718,  0.06841952,  0.0783092 ,  0.08928351,  0.10668141,  0.13087893,  0.1574329 ,  0.18372175,  0.20691479,  0.22946532,  0.22312877,  0.21377924,  0.2052163 ,  0.19731674,  0.19168448,  0.18626106,  0.17883608,  0.16825553,  0.15865545,  0.15038856,  0.1501237 ,  0.14887127,  0.14211628,  0.13536129,  0.1286063 ,  0.12261348,  0.11854441,  0.11447534,  0.11040628,  0.10633721,  0.10226814,  0.09819907,  0.09413001,  0.09006094,  0.08599187,  0.08192281,  0.07785374,  0.07378467,  0.0697156 ,  0.06341402,  0.05430693,  0.04519983,  0.03609273,  0.02698564,  0.01787854,  0.00877145, -0.00033565, -0.00944274, -0.01854984, -0.0298882 , -0.03964588, -0.0522757 , -0.06398166, -0.08204739, -0.10774241, -0.14015965, -0.17775678, -0.2000917 , -0.19969315, -0.19090187, -0.18533757, -0.18152231, -0.17760905, -0.17296967, -0.1655877 , -0.15543254, -0.14645222, -0.13834642, -0.13240119, -0.13105088, -0.12970057, -0.12835026, -0.12699995, -0.12564964, -0.12429933, -0.12294902, -0.12447693, -0.12742342, -0.13036991, -0.1333164 , -0.1362629 , -0.13918201, -0.14192253, -0.14499766, -0.14946994, -0.15794183, -0.169427  , -0.18616259};
 float SS_servo1[] = { 0.16814674,  0.13871318,  0.11587719,  0.09292682,  0.05688125,  0.01865789, -0.01956547, -0.03062074, -0.03294937, -0.035278  , -0.03760663, -0.03993526, -0.04226389, -0.04459252, -0.04692115, -0.04924978, -0.04856162, -0.01071973,  0.02712217,  0.06496407,  0.10280597,  0.14064786,  0.17848976,  0.21689242,  0.24941948,  0.25698088,  0.24053917,  0.21249631,  0.18116312,  0.15218034,  0.12069357,  0.11464122,  0.11544358,  0.1122021 ,  0.11315596,  0.11339437,  0.11425623,  0.11808704,  0.12524156,  0.1318262 ,  0.13573469,  0.12297015,  0.11079019,  0.10815417,  0.10551814,  0.10288212,  0.09994102,  0.09622986,  0.09251871,  0.08880755,  0.0850964 ,  0.08138524,  0.07767409,  0.07396294,  0.07025178,  0.06654063,  0.06282947,  0.05911832,  0.05540716,  0.05169601,  0.05125156,  0.05491226,  0.05857296,  0.06223366,  0.06589435,  0.06955505,  0.07321575,  0.07687645,  0.08053715,  0.08419784,  0.09019498,  0.09563123,  0.10505751,  0.1158546 ,  0.13809757,  0.17581083,  0.22860085,  0.29199097,  0.32507795,  0.30879424,  0.28417189,  0.26787155,  0.25597898,  0.24418608,  0.23049287,  0.20975996,  0.1837055 ,  0.16016753,  0.13838192,  0.12169354,  0.11584554,  0.10999754,  0.10414954,  0.09830154,  0.09245354,  0.08660554,  0.08075754,  0.08145626,  0.08538162,  0.08930699,  0.09323235,  0.09715771,  0.10065791,  0.10238986,  0.1052148 ,  0.11015717,  0.12038307,  0.1355583 ,  0.1570947 };
 float SS_servo2[] = {-0.05025384, -0.04547684, -0.03475988, -0.01707824, -0.01718162, -0.02222803, -0.02727444, -0.03028301, -0.03263701, -0.03499101, -0.03734501, -0.03969901, -0.04205301, -0.04440701, -0.04676101, -0.049115  , -0.05208822, -0.06268751, -0.0732868 , -0.08388609, -0.09448538, -0.10508467, -0.11568396, -0.12674272, -0.14640763, -0.1690711 , -0.19669824, -0.22982256, -0.26584154, -0.30835133, -0.34191067, -0.35376487, -0.34842616, -0.3404131 , -0.33142624, -0.32294184, -0.31420649, -0.30415186, -0.29116442, -0.27578508, -0.25881408, -0.23903917, -0.22426806, -0.2079422 , -0.19161633, -0.17529046, -0.1629154 , -0.16051245, -0.1581095 , -0.15570655, -0.1533036 , -0.15090065, -0.1484977 , -0.14609475, -0.1436918 , -0.14128885, -0.13888591, -0.13648296, -0.13408001, -0.13167706, -0.13247355, -0.13729066, -0.14210777, -0.14692488, -0.15174199, -0.1565591 , -0.16137621, -0.16619332, -0.17101043, -0.17582754, -0.17813958, -0.1646518 , -0.13754441, -0.10192327, -0.06185314, -0.02091555,  0.01845655,  0.05523204,  0.08148251,  0.0809259 ,  0.07791638,  0.07382467,  0.07008292,  0.06643066,  0.06259476,  0.05857076,  0.0557924 ,  0.05301947,  0.05002553,  0.04777747,  0.04711573,  0.04645398,  0.04579224,  0.04513049,  0.04446874,  0.043807  ,  0.04314525,  0.04129261,  0.03885303,  0.03641344,  0.03397385,  0.03153427,  0.02863283,  0.02243762,  0.01575227,  0.00762534, -0.00333016, -0.01704594, -0.03560282};
@@ -26,12 +34,11 @@ float SS_servo7[] = {-0.45262758, -0.44688143, -0.42838346, -0.39800962, -0.3731
 
 int node=0;
 int first=0;
-int input=2;
+int input=0;
 int end_time=0;
-int time_step=40000; //microseconds WAS 200 000
-int steps = 28;
-// int steps[] = {0,28,39,73,96,108}; // set the node at which the robot should stop, then manually increase through the nodes and recompile, rinse and repeat.
-int first_print=1;
+int time_step=100000;
+int steps = sizeof(SS_servo0)/sizeof(SS_servo0[0]);
+int one_print = 0;
 
 // -------------------Joint configurations-------------------
 int servo0=0;
@@ -57,9 +64,9 @@ void setup() {
 
   pca9685.setOscillatorFrequency(27000000); //Value between 24MHz and 27MHz, tuned for this setup
   pca9685.setPWMFreq(SERVO_FREQ);
-  delay (500);
+  delay (1000);
 
-        servo0_deg=SS_servo0[0]/3.14159265*180;
+  servo0_deg=SS_servo0[0]/3.14159265*180;
         servo0=map(servo0_deg,-38,90,2200,1030);
         servo1_deg=SS_servo1[0]/3.14159265*180;
         servo1=map(servo1_deg,-90,90,2600,950);
@@ -135,7 +142,28 @@ void setup() {
         Serial.print(servo7_deg);
         Serial.print("        us:");
         Serial.println(servo7);
-  
+
+        Serial.println("10");
+        delay(1000);
+        Serial.println("9");
+        delay(1000);
+        Serial.println("8");
+        delay(1000);
+        Serial.println("7");
+        delay(1000);
+        Serial.println("6");
+        delay(1000);
+        Serial.println("5");
+        delay(1000);
+        Serial.println("4");
+        delay(1000);
+        Serial.println("3");
+        delay(1000);
+        Serial.println("2");
+        delay(1000);
+        Serial.println("1");
+        delay(1000);
+
 }
 
 void loop() 
@@ -143,16 +171,24 @@ void loop()
   if(Serial.available()>0)
   {
     first=Serial.read();
+    if(first=='2')
+    {
+      input=2;
+      node=0;
+      one_print=1;
+    }
     if(first=='1')
     {
       input=1;
+      node=0;
+      one_print=1;
     }
     if(first=='0')
     {
       input=0;
     }
   }
-  if(input==1)
+  if(input==1 or input==2)
   {
       if(esp_timer_get_time()>=end_time)
       {
@@ -181,13 +217,20 @@ void loop()
         pca9685.setPWM(SER5,0,servo5);
         pca9685.setPWM(SER6,0,servo6);
         pca9685.setPWM(SER7,0,servo7);
-     
+        
         node+=1;
-        if(node>=steps)
-           {
-              input=0;
-              node=steps;
-            }
+        if(node>=steps and input==1)
+        {
+          Serial.print("Input:");
+          Serial.println(input);
+          node=0;
+        }
+        if(node>=steps and input==2)
+        {
+          Serial.print("Input:");
+          Serial.println(input);
+          input=0;
+        }
          end_time=esp_timer_get_time()+time_step;
       }
    }
@@ -203,59 +246,61 @@ void loop()
         pca9685.setPWM(SER6,0,servo6);
         pca9685.setPWM(SER7,0,servo7);
 
-        if(first_print==1)
+        if(one_print==1)
         {
-        first_print=0;
-        Serial.print("Node:");
-        Serial.println(node);
-        Serial.print("servo0 -> rads:");
-        Serial.print(SS_servo0[node]);
-        Serial.print("        deg:");
-        Serial.print(servo0_deg);
-        Serial.print("        us:");
-        Serial.println(servo0);
-        Serial.print("servo1 -> rads:");
-        Serial.print(SS_servo1[node]);
-        Serial.print("        deg:");
-        Serial.print(servo1_deg);
-        Serial.print("        us:");
-        Serial.println(servo1);
-        Serial.print("servo2 -> rads:");
-        Serial.print(SS_servo2[node]);
-        Serial.print("        deg:");
-        Serial.print(servo2_deg);
-        Serial.print("        us:");
-        Serial.println(servo2);
-        Serial.print("servo3 -> rads:");
-        Serial.print(SS_servo3[node]);
-        Serial.print("        deg:");
-        Serial.print(servo3_deg);
-        Serial.print("        us:");
-        Serial.println(servo3);
-        Serial.print("servo4 -> rads:");
-        Serial.print(SS_servo4[node]);
-        Serial.print("        deg:");
-        Serial.print(servo4_deg);
-        Serial.print("        us:");
-        Serial.println(servo4);
-        Serial.print("servo5 -> rads:");
-        Serial.print(SS_servo5[node]);
-        Serial.print("        deg:");
-        Serial.print(servo5_deg);
-        Serial.print("        us:");
-        Serial.println(servo5);
-        Serial.print("servo6 -> rads:");
-        Serial.print(SS_servo6[node]);
-        Serial.print("        deg:");
-        Serial.print(servo6_deg);
-        Serial.print("        us:");
-        Serial.println(servo6);
-        Serial.print("servo7 -> rads:");
-        Serial.print(SS_servo7[node]);
-        Serial.print("        deg:");
-        Serial.print(servo7_deg);
-        Serial.print("        us:");
-        Serial.println(servo7);
+          Serial.print("Input:");
+          Serial.println(input);
+          Serial.print("Node:");
+          Serial.println(node);
+          Serial.print("servo0 -> rads:");
+          Serial.print(SS_servo0[node]);
+          Serial.print("        deg:");
+          Serial.print(servo0_deg);
+          Serial.print("        us:");
+          Serial.println(servo0);
+          Serial.print("servo1 -> rads:");
+          Serial.print(SS_servo1[node]);
+          Serial.print("        deg:");
+          Serial.print(servo1_deg);
+          Serial.print("        us:");
+          Serial.println(servo1);
+          Serial.print("servo2 -> rads:");
+          Serial.print(SS_servo2[node]);
+          Serial.print("        deg:");
+          Serial.print(servo2_deg);
+          Serial.print("        us:");
+          Serial.println(servo2);
+          Serial.print("servo3 -> rads:");
+          Serial.print(SS_servo3[node]);
+          Serial.print("        deg:");
+          Serial.print(servo3_deg);
+          Serial.print("        us:");
+          Serial.println(servo3);
+          Serial.print("servo4 -> rads:");
+          Serial.print(SS_servo4[node]);
+          Serial.print("        deg:");
+          Serial.print(servo4_deg);
+          Serial.print("        us:");
+          Serial.println(servo4);
+          Serial.print("servo5 -> rads:");
+          Serial.print(SS_servo5[node]);
+          Serial.print("        deg:");
+          Serial.print(servo5_deg);
+          Serial.print("        us:");
+          Serial.println(servo5);
+          Serial.print("servo6 -> rads:");
+          Serial.print(SS_servo6[node]);
+          Serial.print("        deg:");
+          Serial.print(servo6_deg);
+          Serial.print("        us:");
+          Serial.println(servo6);
+          Serial.print("servo7 -> rads:");
+          Serial.print(SS_servo7[node]);
+          Serial.print("        deg:");
+          Serial.print(servo7_deg);
+          Serial.print("        us:");
+          Serial.println(servo7);
+          one_print=0;
         }
   
   }
