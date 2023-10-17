@@ -36,7 +36,7 @@ import os
 import log
 __logger = log.setup_custom_logger("3D_data_processing")
 
-trajectory_name = 'SS_walk_1cm_z_clearance'
+trajectory_name = 'ThreeD_SS_31'
 # Assigning values
 step=0.01 #s
 
@@ -52,7 +52,8 @@ def _get_result_dir(result_name):
     __logger.info(f"Found parent dir={parent_dir}")
 
     # If we do not have the results directory bail out
-    results_path = "{}/results/{}/".format(parent_dir, result_name)
+    # results_path = "{}/results/{}/".format(parent_dir, result_name)
+    results_path = parent_dir+"/../2D_gait_generation/Results/"
     if not os.path.exists(results_path):
         __logger.error(f"Could not find result path {results_path} - exiting")
         raise Exception("Could not find results directory")
@@ -66,10 +67,16 @@ def _load_results(result_dir):
     CSV object
     """
     __logger.info(f"Loading results from {result_dir}")
-    Properties =  _load_single_result(result_dir + "3D_Properties.csv")
-    Movement =  _load_single_result(result_dir + "3D_col_ros.csv")
-    Torque =  _load_single_result(result_dir + "3D_Nodal.csv")
-    Ros =  _load_single_result(result_dir + "3D_col_traj.csv")
+    # Properties =  _load_single_result(result_dir + "3D_Properties.csv")
+    # Movement =  _load_single_result(result_dir + "3D_col_ros.csv")
+    # Torque =  _load_single_result(result_dir + "3D_Nodal.csv")
+    # Ros =  _load_single_result(result_dir + "3D_col_traj.csv")
+
+    Properties =  _load_single_result(result_dir + trajectory_name+"_3D_Properties.csv")
+    Movement =  _load_single_result(result_dir + trajectory_name+"_3D_col_ros.csv")
+    Torque =  _load_single_result(result_dir + trajectory_name+"_3D_Nodal.csv")
+    Ros =  _load_single_result(result_dir + trajectory_name+"_3D_col_traj.csv")
+
     return [Properties, Movement, Torque, Ros]
 
 
@@ -113,8 +120,8 @@ l_b = Properties.iloc[0,10]
 l_w = Properties.iloc[0,11]
 l_f1 = Properties.iloc[0,12]
 l_t1 = Properties.iloc[0,13]
-step_height = Properties.iloc[0,20]   #step up front: 0.05, default is set up for step up hind
-distance_from_step = Properties.iloc[0,21] #step up front: 0.05+l_b+0.08, default is set up for step up hind
+step_height = 0.0#Properties.iloc[0,20]   #step up front: 0.05, default is set up for step up hind
+distance_from_step = 0.15#Properties.iloc[0,21] #step up front: 0.05+l_b+0.08, default is set up for step up hind
 
 for n in range (1,len(t)):
     t[n]=t[n]+t[n-1]
@@ -155,6 +162,11 @@ def Interpolater(joint,t,step):
 [SS_H4,ss_t] = Interpolater(th_h4,t,step)
 [SS_K4,ss_t] = Interpolater(th_k4,t,step)
 
+ss_k1=SS_K1-SS_H1
+ss_k2=SS_K2-SS_H2
+ss_k3=SS_K3-SS_H3
+ss_k4=SS_K4-SS_H4
+
 plt.plot(ss_t,SS_H1,t,th_h1)
 plt.title('Hip 1 linearised vs trajectory joint angles')
 plt.xlabel('Time (s)')
@@ -175,7 +187,7 @@ print(f'Original Joint size: {len(th_by)}, Original t size: {len(t)}')
 print(f"hip[0]: {th_by[0]}, t[0]: {t[0]}, hip[N]: {th_by[len(th_by)-1]}, t[N]: {t[len(th_by)-1]}\n")
 
 np.set_string_function(lambda x: repr(x).replace('(', '').replace(')', '').replace('array', '').replace("       ", ' ').replace('[','{').replace(']','}').replace('\n','') , repr=False)
-print(f'float SS_servo0[] = {SS_H1};\nfloat SS_servo1[] = {SS_K1};\nfloat SS_servo2[] = {SS_H2};\nfloat SS_servo3[] = {SS_K2};\nfloat SS_servo4[] = {SS_H3};\nfloat SS_servo5[] = {SS_K3};\nfloat SS_servo6[] = {SS_H4};\nfloat SS_servo7[] = {SS_K4};')
+print(f'float SS_servo0[] = {SS_H1};\nfloat SS_servo1[] = {ss_k1};\nfloat SS_servo2[] = {SS_H2};\nfloat SS_servo3[] = {ss_k2};\nfloat SS_servo4[] = {SS_H3};\nfloat SS_servo5[] = {ss_k3};\nfloat SS_servo6[] = {SS_H4};\nfloat SS_servo7[] = {ss_k4};')
 
 print(f"SS_BX[1]={SS_BX[1]},SS_BY[1]={SS_BY[1]},SS_BZ[1]={SS_BZ[1]}")
 
@@ -232,31 +244,31 @@ def TwoD_plot_robot(i,ax):
     ax.plot([h3[0,0],h4[0,0]],[h3[2,0],h4[2,0]],color='xkcd:black')
     
     #Plot Femur 1
-    ax.plot([h1[0,0],k1[0,0]],[h1[2,0],k1[2,0]],color='xkcd:blue')
+    ax.plot([h1[0,0],k1[0,0]],[h1[2,0],k1[2,0]],color='xkcd:red')
 
     #Plot Femur 2
-    ax.plot([h2[0,0],k2[0,0]],[h2[2,0],k2[2,0]],color='xkcd:green')
+    ax.plot([h2[0,0],k2[0,0]],[h2[2,0],k2[2,0]],color='xkcd:blue')
 
     #Plot Femur 3
     ax.plot([h3[0,0],k3[0,0]],[h3[2,0],k3[2,0]],color='xkcd:red')
 
     #Plot Femur 4
-    ax.plot([h4[0,0],k4[0,0]],[h4[2,0],k4[2,0]],color='xkcd:purple')
+    ax.plot([h4[0,0],k4[0,0]],[h4[2,0],k4[2,0]],color='xkcd:blue')
 
     #Plot Tibia 1
-    ax.plot([k1[0,0],foot1[0,0]],[k1[2,0],foot1[2,0]],color='xkcd:blue')
+    ax.plot([k1[0,0],foot1[0,0]],[k1[2,0],foot1[2,0]],color='xkcd:red')
 
     #Plot Tibia 2
-    ax.plot([k2[0,0],foot2[0,0]],[k2[2,0],foot2[2,0]],color='xkcd:green')
+    ax.plot([k2[0,0],foot2[0,0]],[k2[2,0],foot2[2,0]],color='xkcd:blue')
 
     #Plot Tibia 3
     ax.plot([k3[0,0],foot3[0,0]],[k3[2,0],foot3[2,0]],color='xkcd:red')
 
     #Plot Tibia 4
-    ax.plot([k4[0,0],foot4[0,0]],[k4[2,0],foot4[2,0]],color='xkcd:purple')
+    ax.plot([k4[0,0],foot4[0,0]],[k4[2,0],foot4[2,0]],color='xkcd:blue')
 
     #Plot surface
-    ax.plot([-0.3,-l_b/2+distance_from_step,-l_b/2+distance_from_step,l_b/2+distance_from_step+0.4],[0,0,step_height,step_height],color='xkcd:black')
+    # ax.plot([-0.3,-l_b/2+distance_from_step,-l_b/2+distance_from_step,l_b/2+distance_from_step+0.4],[0,0,step_height,step_height],color='xkcd:black')
 
 # _________________________________Cascade Gait Plotting Fucntion___________________________
 def plot_robot_sequence(i,ax,step):
@@ -309,61 +321,61 @@ def plot_robot_sequence(i,ax,step):
     ax.plot([h3[0,0],h4[0,0]],[h3[2,0],h4[2,0]],color='xkcd:black')
         
     #Plot Femur 1
-    ax.plot([h1[0,0],k1[0,0]],[h1[2,0],k1[2,0]],color='xkcd:blue')
+    ax.plot([h1[0,0],k1[0,0]],[h1[2,0],k1[2,0]],color='xkcd:red')
 
     #Plot Femur 2
-    ax.plot([h2[0,0],k2[0,0]],[h2[2,0],k2[2,0]],color='xkcd:green')
+    ax.plot([h2[0,0],k2[0,0]],[h2[2,0],k2[2,0]],color='xkcd:blue')
 
     #Plot Femur 3
     ax.plot([h3[0,0],k3[0,0]],[h3[2,0],k3[2,0]],color='xkcd:red')
 
     #Plot Femur 4
-    ax.plot([h4[0,0],k4[0,0]],[h4[2,0],k4[2,0]],color='xkcd:purple')
+    ax.plot([h4[0,0],k4[0,0]],[h4[2,0],k4[2,0]],color='xkcd:blue')
 
     #Plot Tibia 1
-    ax.plot([k1[0,0],foot1[0,0]],[k1[2,0],foot1[2,0]],color='xkcd:blue')
+    ax.plot([k1[0,0],foot1[0,0]],[k1[2,0],foot1[2,0]],color='xkcd:red')
 
     #Plot Tibia 2
-    ax.plot([k2[0,0],foot2[0,0]],[k2[2,0],foot2[2,0]],color='xkcd:green')
+    ax.plot([k2[0,0],foot2[0,0]],[k2[2,0],foot2[2,0]],color='xkcd:blue')
 
     #Plot Tibia 3
     ax.plot([k3[0,0],foot3[0,0]],[k3[2,0],foot3[2,0]],color='xkcd:red')
 
     #Plot Tibia 4
-    ax.plot([k4[0,0],foot4[0,0]],[k4[2,0],foot4[2,0]],color='xkcd:purple')
+    ax.plot([k4[0,0],foot4[0,0]],[k4[2,0],foot4[2,0]],color='xkcd:blue')
 
     #Plot surface
-    ax.plot([-0.3+offset*step,-l_b/2+distance_from_step+offset*step,-l_b/2+distance_from_step+offset*step,l_b/2+distance_from_step-0.2+offset*step],[0,0,step_height,step_height],color='xkcd:black')
+    # ax.plot([-0.3+offset*step,-l_b/2+distance_from_step+offset*step,-l_b/2+distance_from_step+offset*step,l_b/2+distance_from_step-0.2+offset*step],[0,0,step_height,step_height],color='xkcd:black')
 
 # _____________________________________Stills of linearised gaits________________________________________________
 # Creates still_nr equally spaced still images of the gait
 still_nr = 20
-sequence = (0,12,22,26,30,39)
+sequence = (0,4,21,31,41,46)
 step=range(len(sequence))
 
 fig1, ax1 = plt.subplots(1,1)
 update = lambda i: TwoD_plot_robot(i,ax1) #lambdify update function
 
 animate = ani.FuncAnimation(fig1,update,range(0,len(SS_H1)),interval = 50,repeat=False)
-animate.save(path+"../../../post_processing/image_sorting/"+trajectory_name+".gif", writer='PillowWriter', fps=10)
+animate.save(path+"../../post_processing/image_sorting/"+trajectory_name+".gif", writer='PillowWriter', fps=10)
 HTML(animate.to_jshtml())
 
 # __logger.info(f"Path: {path}")
 # result_path=path+"../../../post_processing/image_sorting/"
 # __logger.info(f"Results path: {result_path}")
 
-# fig2, ax2 = plt.subplots(1,1)
-# for i in np.linspace(0,len(SS_H1)-1,still_nr):
-#     TwoD_plot_robot(int(i),ax2)
-#     plt.title({int(i)})
-#     plt.savefig(path+"..\..\..\post_processing\image_sorting\\"+trajectory_name+"_"+str(int(i))+".png", transparent=True, bbox_inches='tight') #bbox_inches is used to remove excess white around figure
+fig2, ax2 = plt.subplots(1,1)
+for i in np.linspace(0,len(SS_H1)-1,still_nr):
+    TwoD_plot_robot(int(i),ax2)
+    plt.title({int(i)})
+    plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_"+str(int(i))+".png", transparent=True, bbox_inches='tight') #bbox_inches is used to remove excess white around figure
 
-# fig3, ax3 = plt.subplots(1,1)    
-# for g in step:
-#     plot_robot_sequence(sequence[g],ax3,step[g])
+fig3, ax3 = plt.subplots(1,1)    
+for g in step:
+    plot_robot_sequence(sequence[g],ax3,step[g])
 
-# plt.savefig(path+"..\..\..\post_processing\image_sorting\\"+trajectory_name+"_cascade.png", transparent=True, bbox_inches='tight', dpi=500) #bbox_inches is used to remove excess white around figure, dpi(dots per inch) image quality
-# __logger.info("Linearisation complete")
+plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_cascade.png", transparent=True, bbox_inches='tight', dpi=500) #bbox_inches is used to remove excess white around figure, dpi(dots per inch) image quality
+__logger.info("Linearisation complete")
 # 2cm:
 #0,4,6,10,14, 20,26,30,34,39
 # 0,6,14,26,34,39
@@ -375,11 +387,15 @@ HTML(animate.to_jshtml())
 # 0,8,16,24,30,39
 
 # 2cm resulting degrees:
-# angles = {'Node':[sequence[i] for i in range(len(sequence))], 'Motor 1':[SS_H1[i]/np.pi*180 for i in sequence],'Motor 2':[SS_K1[i]/np.pi*180 for i in sequence],'Motor 3':[SS_H2[i]/np.pi*180 for i in sequence],'Motor 4':[SS_K2[i]/np.pi*180 for i in sequence],
-#           'Motor 5':[SS_H3[i]/np.pi*180 for i in sequence],'Motor 6':[SS_K3[i]/np.pi*180 for i in sequence],'Motor 7':[SS_H4[i]/np.pi*180 for i in sequence],'Motor 8':[SS_K4[i]/np.pi*180 for i in sequence]}
+original = {'Node':[sequence[i] for i in range(len(sequence))], 'Body':[SS_BY[i]/np.pi*180 for i in sequence], 'Motor 1':[SS_H1[i]/np.pi*180 for i in sequence],'Motor 2':[SS_K1[i]/np.pi*180 for i in sequence],'Motor 3':[SS_H2[i]/np.pi*180 for i in sequence],'Motor 4':[SS_K2[i]/np.pi*180 for i in sequence],
+          'Motor 5':[SS_H3[i]/np.pi*180 for i in sequence],'Motor 6':[SS_K3[i]/np.pi*180 for i in sequence],'Motor 7':[SS_H4[i]/np.pi*180 for i in sequence],'Motor 8':[SS_K4[i]/np.pi*180 for i in sequence]}
+original = pd.DataFrame(original)
 
-# angles = pd.DataFrame(angles)
-# angles.to_csv(path+"..\..\..\post_processing\image_sorting\\"+trajectory_name+"_select_angles.csv", index = False, header=True)
+angles = {'Node':[sequence[i] for i in range(len(sequence))], 'Motor 1':[SS_H1[i]/np.pi*180 for i in sequence],'Motor 2':[ss_k1[i]/np.pi*180 for i in sequence],'Motor 3':[SS_H2[i]/np.pi*180 for i in sequence],'Motor 4':[ss_k2[i]/np.pi*180 for i in sequence],
+          'Motor 5':[SS_H3[i]/np.pi*180 for i in sequence],'Motor 6':[ss_k3[i]/np.pi*180 for i in sequence],'Motor 7':[SS_H4[i]/np.pi*180 for i in sequence],'Motor 8':[ss_k4[i]/np.pi*180 for i in sequence]}
+
+angles = pd.DataFrame(angles)
+angles.to_csv(path+"..\..\..\post_processing\image_sorting\\"+trajectory_name+"_select_angles.csv", index = False, header=True)
 # print(f'Motor 1: {SS_H1[0]/np.pi*180},\t{SS_H1[6]/np.pi*180},\t{SS_H1[14]/np.pi*180},\t{SS_H1[26]/np.pi*180},\t{SS_H1[34]/np.pi*180},\t{SS_H1[39]/np.pi*180}')
 # print(f'Motor 2: {SS_K1[0]/np.pi*180},\t{SS_K1[6]/np.pi*180},\t{SS_K1[14]/np.pi*180},\t{SS_K1[26]/np.pi*180},\t{SS_K1[34]/np.pi*180},\t{SS_K1[39]/np.pi*180}')
 # print(f'Motor 3: {SS_H2[0]/np.pi*180},\t{SS_H2[6]/np.pi*180},\t{SS_H2[14]/np.pi*180},\t{SS_H2[26]/np.pi*180},\t{SS_H2[34]/np.pi*180},\t{SS_H2[39]/np.pi*180}')
@@ -388,3 +404,4 @@ HTML(animate.to_jshtml())
 # print(f'Motor 6: {SS_K3[0]/np.pi*180},\t{SS_K3[6]/np.pi*180},\t{SS_K3[14]/np.pi*180},\t{SS_K3[26]/np.pi*180},\t{SS_K3[34]/np.pi*180},\t{SS_K3[39]/np.pi*180}')
 # print(f'Motor 7: {SS_H4[0]/np.pi*180},\t{SS_H4[6]/np.pi*180},\t{SS_H4[14]/np.pi*180},\t{SS_H4[26]/np.pi*180},\t{SS_H4[34]/np.pi*180},\t{SS_H4[39]/np.pi*180}')
 # print(f'Motor 8: {SS_K4[0]/np.pi*180},\t{SS_K4[6]/np.pi*180},\t{SS_K4[14]/np.pi*180},\t{SS_K4[26]/np.pi*180},\t{SS_K4[34]/np.pi*180},\t{SS_K4[39]/np.pi*180}')
+print(angles)

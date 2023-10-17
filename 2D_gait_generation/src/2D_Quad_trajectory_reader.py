@@ -109,6 +109,9 @@ t = Movement.iloc[0:end,11]
 for n in range (1,len(t)):
     t[n]=t[n]+t[n-1]
 
+print(f"Travel distance: {x[end-1]-x[0]}")
+print(f"Average velocity: {(x[end-1]-x[0])/(t[end-1]-t[0])}")
+
 l_b = Properties.iloc[0,10]
 l_f1 = Properties.iloc[0,11]
 l_t1 = Properties.iloc[0,12]
@@ -229,24 +232,24 @@ def plot_robot(i,ax): #update function for animation
     legf1_zt = Z[i] + 0.5*l_b*np.cos(SS_BY[i])
     legf1_xb = X[i] + 0.5*l_b*np.sin(SS_BY[i]) - l_f1*np.sin(SS_H1[i]-np.pi/2+SS_BY[i])
     legf1_zb = Z[i] + 0.5*l_b*np.cos(SS_BY[i]) - l_f1*np.cos(SS_H1[i]-np.pi/2+SS_BY[i])
-    ax.plot([legf1_xt,legf1_xb],[legf1_zt,legf1_zb],color='xkcd:blue')
+    ax.plot([legf1_xt,legf1_xb],[legf1_zt,legf1_zb],color='xkcd:red')
 
     #Plot Tibia 1
     legt1_xb = X[i] + 0.5*l_b*np.sin(SS_BY[i]) - l_f1*np.sin(SS_H1[i]-np.pi/2+SS_BY[i]) - l_t1*np.sin(SS_K1[i]-np.pi/2+SS_BY[i]+SS_H1[i])
     legt1_zb = Z[i] + 0.5*l_b*np.cos(SS_BY[i]) - l_f1*np.cos(SS_H1[i]-np.pi/2+SS_BY[i]) - l_t1*np.cos(SS_K1[i]-np.pi/2+SS_BY[i]+SS_H1[i])
-    ax.plot([legf1_xb,legt1_xb],[legf1_zb,legt1_zb],color='xkcd:blue')
+    ax.plot([legf1_xb,legt1_xb],[legf1_zb,legt1_zb],color='xkcd:red')
 
     #Plot Femur 2
     legf2_xt = X[i] + 0.5*l_b*np.sin(SS_BY[i]) 
     legf2_zt = Z[i] + 0.5*l_b*np.cos(SS_BY[i])
     legf2_xb = X[i] + 0.5*l_b*np.sin(SS_BY[i]) - l_f2*np.sin(SS_H2[i]-np.pi/2+SS_BY[i])
     legf2_zb = Z[i] + 0.5*l_b*np.cos(SS_BY[i]) - l_f2*np.cos(SS_H2[i]-np.pi/2+SS_BY[i])
-    ax.plot([legf2_xt,legf2_xb],[legf2_zt,legf2_zb],color='xkcd:green')
+    ax.plot([legf2_xt,legf2_xb],[legf2_zt,legf2_zb],color='xkcd:blue')
 
     #Plot Tibia 2
     legt2_xb = X[i] + 0.5*l_b*np.sin(SS_BY[i]) - l_f2*np.sin(SS_H2[i]-np.pi/2+SS_BY[i]) - l_t2*np.sin(SS_K2[i]-np.pi/2+SS_BY[i]+SS_H2[i])
     legt2_zb = Z[i] + 0.5*l_b*np.cos(SS_BY[i]) - l_f2*np.cos(SS_H2[i]-np.pi/2+SS_BY[i]) - l_t2*np.cos(SS_K2[i]-np.pi/2+SS_BY[i]+SS_H2[i])
-    ax.plot([legf2_xb,legt2_xb],[legf2_zb,legt2_zb],color='xkcd:green')
+    ax.plot([legf2_xb,legt2_xb],[legf2_zb,legt2_zb],color='xkcd:blue')
 
     #Plot Femur 3
     legf3_xt = X[i] - 0.5*l_b*np.sin(SS_BY[i]) 
@@ -265,12 +268,12 @@ def plot_robot(i,ax): #update function for animation
     legf4_zt = Z[i] - 0.5*l_b*np.cos(SS_BY[i])
     legf4_xb = X[i] - 0.5*l_b*np.sin(SS_BY[i]) - l_f4*np.sin(SS_H4[i]-np.pi/2+SS_BY[i])
     legf4_zb = Z[i] - 0.5*l_b*np.cos(SS_BY[i]) - l_f4*np.cos(SS_H4[i]-np.pi/2+SS_BY[i])
-    ax.plot([legf4_xt,legf4_xb],[legf4_zt,legf4_zb],color='xkcd:purple')
+    ax.plot([legf4_xt,legf4_xb],[legf4_zt,legf4_zb],color='xkcd:blue')
 
     #Plot Tibia 4
     legt4_xb = X[i] - 0.5*l_b*np.sin(SS_BY[i]) - l_f4*np.sin(SS_H4[i]-np.pi/2+SS_BY[i]) - l_t4*np.sin(SS_K4[i]-np.pi/2+SS_BY[i]+SS_H4[i])
     legt4_zb = Z[i] - 0.5*l_b*np.cos(SS_BY[i]) - l_f4*np.cos(SS_H4[i]-np.pi/2+SS_BY[i]) - l_t4*np.cos(SS_K4[i]-np.pi/2+SS_BY[i]+SS_H4[i])
-    ax.plot([legf4_xb,legt4_xb],[legf4_zb,legt4_zb],color='xkcd:purple')
+    ax.plot([legf4_xb,legt4_xb],[legf4_zb,legt4_zb],color='xkcd:blue')
 
 # _____________________________________________Cascade Gait Plotting Function________________________________________
 def plot_robot_sequence(i,ax,step): #update function for animation
@@ -291,24 +294,24 @@ def plot_robot_sequence(i,ax,step): #update function for animation
     legf1_zt = Z[i] + 0.5*l_b*np.cos(SS_BY[i])
     legf1_xb = X[i] + 0.5*l_b*np.sin(SS_BY[i]) - l_f1*np.sin(SS_H1[i]-np.pi/2+SS_BY[i])
     legf1_zb = Z[i] + 0.5*l_b*np.cos(SS_BY[i]) - l_f1*np.cos(SS_H1[i]-np.pi/2+SS_BY[i])
-    ax.plot([legf1_xt+offset*step,legf1_xb+offset*step],[legf1_zt,legf1_zb],color='xkcd:blue')
+    ax.plot([legf1_xt+offset*step,legf1_xb+offset*step],[legf1_zt,legf1_zb],color='xkcd:red')
 
     #Plot Tibia 1
     legt1_xb = X[i] + 0.5*l_b*np.sin(SS_BY[i]) - l_f1*np.sin(SS_H1[i]-np.pi/2+SS_BY[i]) - l_t1*np.sin(SS_K1[i]-np.pi/2+SS_BY[i]+SS_H1[i])
     legt1_zb = Z[i] + 0.5*l_b*np.cos(SS_BY[i]) - l_f1*np.cos(SS_H1[i]-np.pi/2+SS_BY[i]) - l_t1*np.cos(SS_K1[i]-np.pi/2+SS_BY[i]+SS_H1[i])
-    ax.plot([legf1_xb+offset*step,legt1_xb+offset*step],[legf1_zb,legt1_zb],color='xkcd:blue')
+    ax.plot([legf1_xb+offset*step,legt1_xb+offset*step],[legf1_zb,legt1_zb],color='xkcd:red')
 
     #Plot Femur 2
     legf2_xt = X[i] + 0.5*l_b*np.sin(SS_BY[i]) 
     legf2_zt = Z[i] + 0.5*l_b*np.cos(SS_BY[i])
     legf2_xb = X[i] + 0.5*l_b*np.sin(SS_BY[i]) - l_f2*np.sin(SS_H2[i]-np.pi/2+SS_BY[i])
     legf2_zb = Z[i] + 0.5*l_b*np.cos(SS_BY[i]) - l_f2*np.cos(SS_H2[i]-np.pi/2+SS_BY[i])
-    ax.plot([legf2_xt+offset*step,legf2_xb+offset*step],[legf2_zt,legf2_zb],color='xkcd:green')
+    ax.plot([legf2_xt+offset*step,legf2_xb+offset*step],[legf2_zt,legf2_zb],color='xkcd:blue')
 
     #Plot Tibia 2
     legt2_xb = X[i] + 0.5*l_b*np.sin(SS_BY[i]) - l_f2*np.sin(SS_H2[i]-np.pi/2+SS_BY[i]) - l_t2*np.sin(SS_K2[i]-np.pi/2+SS_BY[i]+SS_H2[i])
     legt2_zb = Z[i] + 0.5*l_b*np.cos(SS_BY[i]) - l_f2*np.cos(SS_H2[i]-np.pi/2+SS_BY[i]) - l_t2*np.cos(SS_K2[i]-np.pi/2+SS_BY[i]+SS_H2[i])
-    ax.plot([legf2_xb+offset*step,legt2_xb+offset*step],[legf2_zb,legt2_zb],color='xkcd:green')
+    ax.plot([legf2_xb+offset*step,legt2_xb+offset*step],[legf2_zb,legt2_zb],color='xkcd:blue')
 
     #Plot Femur 3
     legf3_xt = X[i] - 0.5*l_b*np.sin(SS_BY[i]) 
@@ -327,26 +330,26 @@ def plot_robot_sequence(i,ax,step): #update function for animation
     legf4_zt = Z[i] - 0.5*l_b*np.cos(SS_BY[i])
     legf4_xb = X[i] - 0.5*l_b*np.sin(SS_BY[i]) - l_f4*np.sin(SS_H4[i]-np.pi/2+SS_BY[i])
     legf4_zb = Z[i] - 0.5*l_b*np.cos(SS_BY[i]) - l_f4*np.cos(SS_H4[i]-np.pi/2+SS_BY[i])
-    ax.plot([legf4_xt+offset*step,legf4_xb+offset*step],[legf4_zt,legf4_zb],color='xkcd:purple')
+    ax.plot([legf4_xt+offset*step,legf4_xb+offset*step],[legf4_zt,legf4_zb],color='xkcd:blue')
 
     #Plot Tibia 4
     legt4_xb = X[i] - 0.5*l_b*np.sin(SS_BY[i]) - l_f4*np.sin(SS_H4[i]-np.pi/2+SS_BY[i]) - l_t4*np.sin(SS_K4[i]-np.pi/2+SS_BY[i]+SS_H4[i])
     legt4_zb = Z[i] - 0.5*l_b*np.cos(SS_BY[i]) - l_f4*np.cos(SS_H4[i]-np.pi/2+SS_BY[i]) - l_t4*np.cos(SS_K4[i]-np.pi/2+SS_BY[i]+SS_H4[i])
-    ax.plot([legf4_xb+offset*step,legt4_xb+offset*step],[legf4_zb,legt4_zb],color='xkcd:purple')
+    ax.plot([legf4_xb+offset*step,legt4_xb+offset*step],[legf4_zb,legt4_zb],color='xkcd:blue')
 
 # ___________________________________Videos of linearised gaits_____________________________________________
 fig1, ax1 = plt.subplots(1,1) #create axes
 #ax1.set_aspect('equal')       
 update = lambda i: plot_robot(i,ax1) #lambdify update function
 
-# animate = ani.FuncAnimation(fig1,update,range(0,len(SS_H1)),interval = 50,repeat=False)
-# animate.save(path+"..\..\post_processing\image_sorting\\"+trajectory_name+".gif", writer='PillowWriter', fps=10)
-# HTML(animate.to_jshtml())
+animate = ani.FuncAnimation(fig1,update,range(0,len(SS_H1)),interval = 50,repeat=False)
+animate.save(path+"..\..\post_processing\image_sorting\\"+trajectory_name+".gif", writer='PillowWriter', fps=10)
+HTML(animate.to_jshtml())
 
 # _____________________________________Stills of linearised gaits________________________________________________
 # Creates still_nr equally spaced still images of the gait
 still_nr = 20
-sequence = np.array([0,28,39,73,96,108])
+sequence = np.array([0,11,28,68,90,108])
 step=range(len(sequence))
 
 fig2, ax2 = plt.subplots(1,1)
@@ -355,10 +358,10 @@ for i in np.linspace(0,len(SS_H1)-1,still_nr):
     plt.title({int(i)})
     plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_"+str(int(i))+".png", transparent=True, bbox_inches='tight') #bbox_inches is used to remove excess white around figure
 
-# fig3, ax3 = plt.subplots(1,1)    
-# for g in step:
-#     plot_robot_sequence(sequence[g],ax3,step[g])
-# plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_cascade.png", transparent=True, bbox_inches='tight',dpi=500) #bbox_inches is used to remove excess white around figure, dpi(dots per inch) image quality
+fig3, ax3 = plt.subplots(1,1)    
+for g in step:
+    plot_robot_sequence(sequence[g],ax3,step[g])
+plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_cascade.png", transparent=True, bbox_inches='tight',dpi=500) #bbox_inches is used to remove excess white around figure, dpi(dots per inch) image quality
 
 angles = {'Node':[sequence[i] for i in range(len(sequence))], 'Body':[SS_BY[i]/np.pi*180 for i in sequence], 'Motor 1':[SS_H1[i]/np.pi*180 for i in sequence],'Motor 2':[SS_K1[i]/np.pi*180 for i in sequence],'Motor 3':[SS_H2[i]/np.pi*180 for i in sequence],'Motor 4':[SS_K2[i]/np.pi*180 for i in sequence],
           'Motor 5':[SS_H3[i]/np.pi*180 for i in sequence],'Motor 6':[SS_K3[i]/np.pi*180 for i in sequence],'Motor 7':[SS_H4[i]/np.pi*180 for i in sequence],'Motor 8':[SS_K4[i]/np.pi*180 for i in sequence]}
