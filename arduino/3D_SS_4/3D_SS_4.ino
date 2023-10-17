@@ -20,6 +20,8 @@ Adafruit_PWMServoDriver pca9685 = Adafruit_PWMServoDriver();
 #define SER6 6 //Hip 4
 #define SER7 7 //Knee 4
 
+// Travelled 18 cm forward, turned 12deg to the right
+
 // Insert servo angles here:
 // For 3D gaits, these angles are obtained from linearisation.py
 // For 2D gaits, these angles are obtained from 2D_trajectory_reader.py
@@ -36,7 +38,7 @@ int node=0;
 int first=0;
 int input=0;
 int end_time=0;
-int time_step=100000;
+int time_step=120000;
 int steps = sizeof(SS_servo0)/sizeof(SS_servo0[0]);
 int one_print = 0;
 

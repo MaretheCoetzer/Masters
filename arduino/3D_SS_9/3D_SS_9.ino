@@ -20,10 +20,11 @@ Adafruit_PWMServoDriver pca9685 = Adafruit_PWMServoDriver();
 #define SER6 6 //Hip 4
 #define SER7 7 //Knee 4
 
+
+
 // Insert servo angles here:
 // For 3D gaits, these angles are obtained from linearisation.py
 // For 2D gaits, these angles are obtained from 2D_trajectory_reader.py
-
 
 int node=0;
 int first=0;
@@ -61,19 +62,19 @@ void setup() {
 
   servo0_deg=SS_servo0[0]/3.14159265*180;
         servo0=map(servo0_deg,-38,90,2200,1030);
-        servo1_deg=SS_servo1[0]/3.14159265*180-servo0_deg;
+        servo1_deg=SS_servo1[0]/3.14159265*180;
         servo1=map(servo1_deg,-90,90,2600,950);
         servo2_deg=SS_servo2[0]/3.14159265*180;
         servo2=map(servo2_deg,-37,90,1500,2670);
-        servo3_deg=SS_servo3[0]/3.14159265*180-servo2_deg;
+        servo3_deg=SS_servo3[0]/3.14159265*180;
         servo3=map(servo3_deg,-90,90,1100,2700);
         servo4_deg=SS_servo4[0]/3.14159265*180;
         servo4=map(servo4_deg,-90,38,2700,1500);
-        servo5_deg=SS_servo5[0]/3.14159265*180-servo4_deg;
+        servo5_deg=SS_servo5[0]/3.14159265*180;
         servo5=map(servo5_deg,-90,90,2600,930);
         servo6_deg=SS_servo6[0]/3.14159265*180;
         servo6=map(servo6_deg,-90,38,850,2250);
-        servo7_deg=SS_servo7[0]/3.14159265*180-servo6_deg;
+        servo7_deg=SS_servo7[0]/3.14159265*180;
         servo7=map(servo7_deg,-90,90,920,2620);
         
         pca9685.setPWM(SER0,0,servo0);
@@ -187,19 +188,19 @@ void loop()
       {
         servo0_deg=SS_servo0[node]/3.14159265*180;
         servo0=map(servo0_deg,-38,90,2200,1030);
-        servo1_deg=SS_servo1[node]/3.14159265*180-servo0_deg;
+        servo1_deg=SS_servo1[node]/3.14159265*180;
         servo1=map(servo1_deg,-90,90,2600,950);
         servo2_deg=SS_servo2[node]/3.14159265*180;
         servo2=map(servo2_deg,-37,90,1500,2670);
-        servo3_deg=SS_servo3[node]/3.14159265*180-servo2_deg;
+        servo3_deg=SS_servo3[node]/3.14159265*180;
         servo3=map(servo3_deg,-90,90,1100,2700);
         servo4_deg=SS_servo4[node]/3.14159265*180;
         servo4=map(servo4_deg,-90,38,2700,1500);
-        servo5_deg=SS_servo5[node]/3.14159265*180-servo4_deg;
+        servo5_deg=SS_servo5[node]/3.14159265*180;
         servo5=map(servo5_deg,-90,90,2600,930);
         servo6_deg=SS_servo6[node]/3.14159265*180;
         servo6=map(servo6_deg,-90,38,850,2250);
-        servo7_deg=SS_servo7[node]/3.14159265*180-servo6_deg;
+        servo7_deg=SS_servo7[node]/3.14159265*180;
         servo7=map(servo7_deg,-90,90,920,2620);
         
         pca9685.setPWM(SER0,0,servo0);

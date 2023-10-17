@@ -20,6 +20,10 @@ Adafruit_PWMServoDriver pca9685 = Adafruit_PWMServoDriver();
 #define SER6 6 //Hip 4
 #define SER7 7 //Knee 4
 
+// normal travel = 16.5 cm over 3 gaits
+// left right swopped travel = 17cm over 3 gaits, 11 deg turn to left
+// front back swopped travel = 
+
 // Insert servo angles here:
 // For 3D gaits, these angles are obtained from linearisation.py
 // For 2D gaits, these angles are obtained from 2D_trajectory_reader.py
@@ -71,7 +75,7 @@ void setup() {
         servo1_deg=SS_servo1[0]/3.14159265*180;
         servo1=map(servo1_deg,-90,90,2600,950);
         servo2_deg=SS_servo2[0]/3.14159265*180;
-        servo2=map(servo2_deg,-37,90,1500,2670);
+        servo2=map(servo2_deg,-38,90,1510,2730);
         servo3_deg=SS_servo3[0]/3.14159265*180;
         servo3=map(servo3_deg,-90,90,1100,2700);
         servo4_deg=SS_servo4[0]/3.14159265*180;
@@ -197,7 +201,7 @@ void loop()
         servo1_deg=SS_servo1[node]/3.14159265*180;
         servo1=map(servo1_deg,-90,90,2600,950);
         servo2_deg=SS_servo2[node]/3.14159265*180;
-        servo2=map(servo2_deg,-37,90,1500,2670);
+        servo2=map(servo2_deg,-38,90,1510,2730);
         servo3_deg=SS_servo3[node]/3.14159265*180;
         servo3=map(servo3_deg,-90,90,1100,2700);
         servo4_deg=SS_servo4[node]/3.14159265*180;
