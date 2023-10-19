@@ -30,7 +30,7 @@ int first=0;
 int input=2;
 int end_time=0;
 int time_step=40000; //microseconds WAS 200 000
-int steps = 90;
+int steps = 11;
 // int steps[] = {0,11,28,68,90,108}; // set the node at which the robot should stop, then manually increase through the nodes and recompile, rinse and repeat.
 int first_print=1;
 
