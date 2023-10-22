@@ -35,7 +35,7 @@ import os
 import log
 __logger = log.setup_custom_logger("2D_data_processing")
 
-trajectory_name = 'TwoD_SS_lift_20'
+trajectory_name = 'TwoD_SS_84'
 
 # Assigning values
 step=0.01 #s
@@ -69,7 +69,7 @@ def _load_results(result_dir):
     __logger.info(f"Loading results from {result_dir}")
     Properties =  _load_single_result(result_dir + trajectory_name+"_Properties.csv")
     Movement =  _load_single_result(result_dir + trajectory_name+"_col_ros.csv")
-    Torque =  _load_single_result(result_dir + trajectory_name+"_Torque.csv")
+    Torque =  _load_single_result(result_dir + trajectory_name+"Nodal.csv")
     Ros =  _load_single_result(result_dir + trajectory_name+"_col_traj.csv")
     return [Properties, Movement, Torque, Ros]
 
@@ -122,14 +122,65 @@ l_t3 = Properties.iloc[0,16]
 l_f4 = Properties.iloc[0,17]
 l_t4 = Properties.iloc[0,18]
 
-Torque_h1 = Torque.iloc[:,0]
-Torque_k1 = Torque.iloc[:,1]
-Torque_h2 = Torque.iloc[:,2]
-Torque_k2 = Torque.iloc[:,3]
-Torque_h3 = Torque.iloc[:,4]
-Torque_k3 = Torque.iloc[:,5]
-Torque_h4 = Torque.iloc[:,6]
-Torque_k4 = Torque.iloc[:,7]
+Torque_h1 = Torque.iloc[:,1]
+Torque_k1 = Torque.iloc[:,2]
+Torque_h2 = Torque.iloc[:,3]
+Torque_k2 = Torque.iloc[:,4]
+Torque_h3 = Torque.iloc[:,5]
+Torque_k3 = Torque.iloc[:,6]
+Torque_h4 = Torque.iloc[:,7]
+Torque_k4 = Torque.iloc[:,8]
+
+print(f"N:{N}")
+print(f"Torque_h1: {Torque_h1}")
+print(f"Torque_k1: {Torque_k1}")
+
+plt.plot(range(N),Torque_h1,range(N),Torque_k1,range(N),Torque_h2,range(N),Torque_k2,
+         range(N),Torque_h3,range(N),Torque_k3,range(N),Torque_h4,range(N),Torque_k4)
+plt.title('Joint Torques Required for Gait')
+plt.xlabel('Time (s)')
+plt.ylabel('Torque(Nm)')
+plt.legend(['Hip 1','Knee 1','Hip 2','Knee 2','Hip 3','Knee 3','Hip 4','Knee 4'])
+plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_torque.png")
+plt.show()
+
+Foot_1z = Torque.iloc[:,9]
+Foot_2z = Torque.iloc[:,10]
+Foot_3z = Torque.iloc[:,11]
+Foot_4z = Torque.iloc[:,12]
+
+plt.plot(range(N),Foot_1z,range(N),Foot_2z,range(N),Foot_3z,range(N),Foot_4z)
+plt.title('Gait Ground Clearance per Foot')
+plt.xlabel('Time (s)')
+plt.ylabel('Ground Clearance (m)')
+plt.legend(['Foot 1','Foot 2','Foot 3','Foot 4'])
+plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_clearance.png")
+plt.show()
+
+GRF_1x = Ros.iloc[:,22]
+GRF_1z = Ros.iloc[:,23]
+GRF_2x = Ros.iloc[:,24]
+GRF_2z = Ros.iloc[:,25]
+GRF_3x = Ros.iloc[:,26]
+GRF_3z = Ros.iloc[:,27]
+GRF_4x = Ros.iloc[:,28]
+GRF_4z = Ros.iloc[:,29]
+
+plt.plot(range(N*3),GRF_1x,range(N*3),GRF_2x,range(N*3),GRF_3x,range(N*3),GRF_4x)
+plt.title('GRF in the Horisontal Direction per Foot')
+plt.xlabel('Time (s)')
+plt.ylabel('GRF_x (N)')
+plt.legend(['Foot 1','Foot 2','Foot 3','Foot 4'])
+plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_GRF_x.png")
+plt.show()
+
+plt.plot(range(N*3),GRF_1z,range(N*3),GRF_2z,range(N*3),GRF_3z,range(N*3),GRF_4z)
+plt.title('GRF in the Horisontal Direction per Foot')
+plt.xlabel('Time (s)')
+plt.ylabel('GRF_z (N)')
+plt.legend(['Foot 1','Foot 2','Foot 3','Foot 4'])
+plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_GRF_z.png")
+plt.show()
 
 # __________________________________Linearization of Data__________________________________________________
 def Interpolater(joint,t,step):
@@ -176,6 +227,8 @@ ss_k1=(SS_K1)*-1
 ss_k2=(SS_K2)*-1
 ss_k3=(SS_K3)*-1
 ss_k4=(SS_K4)*-1
+
+
 
 # plt.plot(ss_t,SS_H1,t,th_h1)
 # plt.title('Hip 1 linearised vs trajectory joint angles')
