@@ -35,11 +35,15 @@ import os
 import log
 __logger = log.setup_custom_logger("2D_data_processing")
 
-trajectory_name = 'TwoD_SS_84'
+trajectory_name = 'TwoD_SS_148'
+# Complete: 84,86
+# Failed:
+# 101 not result not found
 
 # Assigning values
 step=0.01 #s
-
+__logger.info("_____________________________________________________________________________________")
+__logger.info(f"Gait: {trajectory_name}")
 
 # _________________________________Helper functions____________________________
 def _get_result_dir(result_name):
@@ -109,9 +113,6 @@ t = Movement.iloc[0:end,11]
 for n in range (1,len(t)):
     t[n]=t[n]+t[n-1]
 
-print(f"Travel distance: {x[end-1]-x[0]}")
-print(f"Average velocity: {(x[end-1]-x[0])/(t[end-1]-t[0])}")
-
 l_b = Properties.iloc[0,10]
 l_f1 = Properties.iloc[0,11]
 l_t1 = Properties.iloc[0,12]
@@ -122,6 +123,7 @@ l_t3 = Properties.iloc[0,16]
 l_f4 = Properties.iloc[0,17]
 l_t4 = Properties.iloc[0,18]
 
+h = Torque.iloc[:,0]
 Torque_h1 = Torque.iloc[:,1]
 Torque_k1 = Torque.iloc[:,2]
 Torque_h2 = Torque.iloc[:,3]
@@ -131,31 +133,33 @@ Torque_k3 = Torque.iloc[:,6]
 Torque_h4 = Torque.iloc[:,7]
 Torque_k4 = Torque.iloc[:,8]
 
-print(f"N:{N}")
-print(f"Torque_h1: {Torque_h1}")
-print(f"Torque_k1: {Torque_k1}")
+fig_5,ax_5 = plt.subplots(1)
 
-plt.plot(range(N),Torque_h1,range(N),Torque_k1,range(N),Torque_h2,range(N),Torque_k2,
+ax_5.plot(range(N),Torque_h1,range(N),Torque_k1,range(N),Torque_h2,range(N),Torque_k2,
          range(N),Torque_h3,range(N),Torque_k3,range(N),Torque_h4,range(N),Torque_k4)
-plt.title('Joint Torques Required for Gait')
-plt.xlabel('Time (s)')
-plt.ylabel('Torque(Nm)')
-plt.legend(['Hip 1','Knee 1','Hip 2','Knee 2','Hip 3','Knee 3','Hip 4','Knee 4'])
-plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_torque.png")
-plt.show()
+ax_5.set_title('Joint Torques Required for Gait')
+ax_5.set_xlabel('Node')
+ax_5.set_ylabel('Torque(Nm)')
+ax_5.legend(['Hip 1','Knee 1','Hip 2','Knee 2','Hip 3','Knee 3','Hip 4','Knee 4'])
+plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_torque.png", transparent=True, bbox_inches='tight',dpi=500) 
+# plt.show()
+
+fig_6,ax_6 = plt.subplots(1)
 
 Foot_1z = Torque.iloc[:,9]
 Foot_2z = Torque.iloc[:,10]
 Foot_3z = Torque.iloc[:,11]
 Foot_4z = Torque.iloc[:,12]
 
-plt.plot(range(N),Foot_1z,range(N),Foot_2z,range(N),Foot_3z,range(N),Foot_4z)
-plt.title('Gait Ground Clearance per Foot')
-plt.xlabel('Time (s)')
-plt.ylabel('Ground Clearance (m)')
-plt.legend(['Foot 1','Foot 2','Foot 3','Foot 4'])
-plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_clearance.png")
-plt.show()
+ax_6.plot(range(N),Foot_1z,range(N),Foot_2z,range(N),Foot_3z,range(N),Foot_4z)
+ax_6.set_title('Gait Ground Clearance per Foot')
+ax_6.set_xlabel('Node')
+ax_6.set_ylabel('Ground Clearance (m)')
+ax_6.legend(['Foot 1','Foot 2','Foot 3','Foot 4'])
+plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_clearance.png", transparent=True, bbox_inches='tight',dpi=500)
+# plt.show()
+
+fig_7,ax_7 = plt.subplots(1)
 
 GRF_1x = Ros.iloc[:,22]
 GRF_1z = Ros.iloc[:,23]
@@ -166,21 +170,23 @@ GRF_3z = Ros.iloc[:,27]
 GRF_4x = Ros.iloc[:,28]
 GRF_4z = Ros.iloc[:,29]
 
-plt.plot(range(N*3),GRF_1x,range(N*3),GRF_2x,range(N*3),GRF_3x,range(N*3),GRF_4x)
-plt.title('GRF in the Horisontal Direction per Foot')
-plt.xlabel('Time (s)')
-plt.ylabel('GRF_x (N)')
-plt.legend(['Foot 1','Foot 2','Foot 3','Foot 4'])
-plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_GRF_x.png")
-plt.show()
+slip_1 = abs(GRF_1x)-GRF_1z
+slip_2 = abs(GRF_2x)-GRF_2z
+slip_3 = abs(GRF_3x)-GRF_3z
+slip_4 = abs(GRF_4x)-GRF_4z
 
-plt.plot(range(N*3),GRF_1z,range(N*3),GRF_2z,range(N*3),GRF_3z,range(N*3),GRF_4z)
-plt.title('GRF in the Horisontal Direction per Foot')
-plt.xlabel('Time (s)')
-plt.ylabel('GRF_z (N)')
-plt.legend(['Foot 1','Foot 2','Foot 3','Foot 4'])
-plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_GRF_z.png")
-plt.show()
+ax_7.plot(range(N*3),slip_1,range(N*3),slip_2,range(N*3),slip_3,range(N*3),slip_4)
+ax_7.set_title('Gait Slippage')
+ax_7.set_xlabel('Node')
+ax_7.set_ylabel('Slip (N)')
+ax_7.legend(['Foot 1','Foot 2','Foot 3','Foot 4'])
+plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_slip.png", transparent=True, bbox_inches='tight',dpi=500)
+# plt.show()
+
+__logger.info(f"Travel distance: {x[end-1]-x[0]}")
+__logger.info(f"Gait duration: {t[end-1]-t[0]}")
+__logger.info(f"Average velocity: {(x[end-1]-x[0])/(t[end-1]-t[0])}")
+__logger.info(f"Cost function value: {sum(((Torque_h1[n]**2+Torque_k1[n]**2+Torque_h2[n]**2+Torque_k2[n]**2+Torque_h3[n]**2+Torque_k3[n]**2+Torque_h4[n]**2+Torque_k4[n]**2)*h[n]) for n in range(N))/x[N]}")
 
 # __________________________________Linearization of Data__________________________________________________
 def Interpolater(joint,t,step):
@@ -421,3 +427,4 @@ angles = {'Node':[sequence[i] for i in range(len(sequence))], 'Body':[SS_BY[i]/n
 angles = pd.DataFrame(angles)
 print(f" Trajectory Angles:\n {angles}")
 angles.to_csv(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_selected_angles.csv", index = False, header=True)
+print("Complete")
