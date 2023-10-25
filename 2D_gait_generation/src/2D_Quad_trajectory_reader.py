@@ -35,7 +35,7 @@ import os
 import log
 __logger = log.setup_custom_logger("2D_data_processing")
 
-trajectory_name = 'TwoD_SS_148'
+trajectory_name = 'TwoD_SS_lift_38'
 # Complete: 84,86
 # Failed:
 # 101 not result not found
@@ -73,7 +73,7 @@ def _load_results(result_dir):
     __logger.info(f"Loading results from {result_dir}")
     Properties =  _load_single_result(result_dir + trajectory_name+"_Properties.csv")
     Movement =  _load_single_result(result_dir + trajectory_name+"_col_ros.csv")
-    Torque =  _load_single_result(result_dir + trajectory_name+"Nodal.csv")
+    Torque =  _load_single_result(result_dir + trajectory_name+"_Nodal.csv")
     Ros =  _load_single_result(result_dir + trajectory_name+"_col_traj.csv")
     return [Properties, Movement, Torque, Ros]
 
