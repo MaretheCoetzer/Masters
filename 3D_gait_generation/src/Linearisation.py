@@ -36,7 +36,7 @@ import os
 import log
 __logger = log.setup_custom_logger("3D_data_processing")
 
-trajectory_name = 'ThreeD_SS_31'
+trajectory_name = 'ThreeD_SS_76'
 # Assigning values
 step=0.01 #s
 
@@ -126,6 +126,32 @@ distance_from_step = 0.15#Properties.iloc[0,21] #step up front: 0.05+l_b+0.08, d
 for n in range (1,len(t)):
     t[n]=t[n]+t[n-1]
 
+h = Torque.iloc[:,0]
+Torque_h1 = Torque.iloc[:,1]
+Torque_k1 = Torque.iloc[:,2]
+Torque_h2 = Torque.iloc[:,3]
+Torque_k2 = Torque.iloc[:,4]
+Torque_h3 = Torque.iloc[:,5]
+Torque_k3 = Torque.iloc[:,6]
+Torque_h4 = Torque.iloc[:,7]
+Torque_k4 = Torque.iloc[:,8]
+
+fig_5,ax_5 = plt.subplots(1)
+
+ax_5.plot(range(N),Torque_h1,range(N),Torque_k1,range(N),Torque_h2,range(N),Torque_k2,
+         range(N),Torque_h3,range(N),Torque_k3,range(N),Torque_h4,range(N),Torque_k4)
+ax_5.set_title('Joint Torques Required for Gait')
+ax_5.set_xlabel('Node')
+ax_5.set_ylabel('Torque(Nm)')
+ax_5.legend(['Hip 1','Knee 1','Hip 2','Knee 2','Hip 3','Knee 3','Hip 4','Knee 4'])
+plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_torque.png", transparent=True, bbox_inches='tight',dpi=500) 
+plt.show()
+
+foot_1z=[]
+foot_2z=[]
+foot_3z=[]
+foot_4z=[]
+
 #  ___________________________________Lineaerization of Data_________________
 def Interpolater(joint,t,step):
     n = 1       #original joint and time step counter
@@ -167,19 +193,19 @@ ss_k2=SS_K2-SS_H2
 ss_k3=SS_K3-SS_H3
 ss_k4=SS_K4-SS_H4
 
-plt.plot(ss_t,SS_H1,t,th_h1)
-plt.title('Hip 1 linearised vs trajectory joint angles')
-plt.xlabel('Time (s)')
-plt.ylabel('Joint angle (rad)')
-plt.legend(['Linearised data','Trajectory data'])
-plt.show()
+# plt.plot(ss_t,SS_H1,t,th_h1)
+# plt.title('Hip 1 linearised vs trajectory joint angles')
+# plt.xlabel('Time (s)')
+# plt.ylabel('Joint angle (rad)')
+# plt.legend(['Linearised data','Trajectory data'])
+# plt.show()
 
-plt.plot(ss_t,SS_K1,t,th_k1)
-plt.title('Knee 1 linearised vs trajectory joint angles')
-plt.xlabel('Time (s)')
-plt.ylabel('Joint angle (rad)')
-plt.legend(['Linearised data','Trajectory data'])
-plt.show()
+# plt.plot(ss_t,SS_K1,t,th_k1)
+# plt.title('Knee 1 linearised vs trajectory joint angles')
+# plt.xlabel('Time (s)')
+# plt.ylabel('Joint angle (rad)')
+# plt.legend(['Linearised data','Trajectory data'])
+# plt.show()
 
 print(f'Interpolated Joint size: {len(SS_BY)}, Interpolated t size: {len(ss_t)}')
 print(f"hip[0]: {SS_BY[0]}, t[0]: {ss_t[0]}, hip[N]: {SS_BY[len(SS_BY)-1]}, t[N]: {ss_t[len(SS_BY)-1]}")
@@ -270,6 +296,36 @@ def TwoD_plot_robot(i,ax):
     #Plot surface
     # ax.plot([-0.3,-l_b/2+distance_from_step,-l_b/2+distance_from_step,l_b/2+distance_from_step+0.4],[0,0,step_height,step_height],color='xkcd:black')
 
+# # _______________________________2D Quad Plotting Function________________________
+# def TwoD_plot_clearance(i):
+#     rx=[[1, 0, 0], [0, np.cos(th_bx[i]), -np.sin(th_bx[i])], [0, np.sin(th_bx[i]), np.cos(th_bx[i])]]
+#     ry=[[np.cos(th_by[i]), 0, np.sin(th_by[i])], [0, 1, 0], [-np.sin(th_by[i]), 0, np.cos(th_by[i])]]
+#     rz=[[np.cos(th_bz[i]), -np.sin(th_bz[i]), 0], [np.sin(th_bz[i]), np.cos(th_bz[i]), 0], [0, 0, 1]]
+#     rxy=np.matmul(rx,ry)
+#     rxyz=np.matmul(rxy,rz)
+
+#     Foot11=[[0.5*l_b+l_f1*np.sin(th_h1[i])+l_t1*np.sin(th_k1[i])],[0.5*l_w],[-l_f1*np.cos(th_h1[i])-l_t1*np.cos(th_k1[i])]]
+#     Foot22=[[0.5*l_b+l_f1*np.sin(th_h2[i])+l_t1*np.sin(th_k2[i])],[-0.5*l_w],[-l_f1*np.cos(th_h2[i])-l_t1*np.cos(th_k2[i])]]
+#     Foot33=[[-0.5*l_b+l_f1*np.sin(th_h3[i])+l_t1*np.sin(th_k3[i])],[0.5*l_w],[-l_f1*np.cos(th_h3[i])-l_t1*np.cos(th_k3[i])]]
+#     Foot44=[[-0.5*l_b+l_f1*np.sin(th_h4[i])+l_t1*np.sin(th_k4[i])],[-0.5*l_w],[-l_f1*np.cos(th_h4[i])-l_t1*np.cos(th_k4[i])]]
+
+#     b = [[x[i]],[y[i]],[z[i]]]
+
+#     foot1= b + np.matmul(rxyz,Foot11)
+#     foot2= b + np.matmul(rxyz,Foot22)
+#     foot3= b + np.matmul(rxyz,Foot33)
+#     foot4= b + np.matmul(rxyz,Foot44)
+
+#     foot_1z.append(foot1[2,0])
+#     foot_2z.append(foot2[2,0])
+#     foot_3z.append(foot3[2,0])
+#     foot_4z.append(foot4[2,0])
+# # 
+#     # axs.plot(foot1[2,0],'*')
+#     # axs.plot(foot2[2,0],'*')
+#     # axs.plot(foot3[2,0],'*')
+#     # axs.plot(foot4[2,0],'*')
+
 # _________________________________Cascade Gait Plotting Fucntion___________________________
 def plot_robot_sequence(i,ax,step):
     ax.set_ylim([0.0,2])
@@ -347,6 +403,7 @@ def plot_robot_sequence(i,ax,step):
     #Plot surface
     # ax.plot([-0.3+offset*step,-l_b/2+distance_from_step+offset*step,-l_b/2+distance_from_step+offset*step,l_b/2+distance_from_step-0.2+offset*step],[0,0,step_height,step_height],color='xkcd:black')
 
+
 # _____________________________________Stills of linearised gaits________________________________________________
 # Creates still_nr equally spaced still images of the gait
 still_nr = 20
@@ -354,17 +411,29 @@ sequence = (0,4,21,31,41,46)
 step=range(len(sequence))
 
 fig1, ax1 = plt.subplots(1,1)
+# fig6, ax6 = plt.subplots(1,1)
 update = lambda i: TwoD_plot_robot(i,ax1) #lambdify update function
 
 animate = ani.FuncAnimation(fig1,update,range(0,len(SS_H1)),interval = 50,repeat=False)
 animate.save(path+"../../post_processing/image_sorting/"+trajectory_name+".gif", writer='PillowWriter', fps=10)
 HTML(animate.to_jshtml())
 
+# for i in range(len(th_h1)/3-1):
+#     n=i*3
+#     TwoD_plot_clearance(n)
+# ax6.plot(range(len(foot_1z)),foot_1z,range(len(foot_2z)),foot_2z,range(len(foot_3z)),foot_3z,range(len(foot_4z)),foot_4z)
+# ax6.set_title('Gait Ground Clearance per Foot')
+# ax6.set_xlabel('Node')
+# ax6.set_ylabel('Ground Clearance (cm)')
+# ax6.legend(['Foot 1','Foot 2','Foot 3','Foot 4'])
+# plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_clearance.png", transparent=True, bbox_inches='tight',dpi=500)
+# plt.show()
 # __logger.info(f"Path: {path}")
 # result_path=path+"../../../post_processing/image_sorting/"
 # __logger.info(f"Results path: {result_path}")
 
 fig2, ax2 = plt.subplots(1,1)
+
 for i in np.linspace(0,len(SS_H1)-1,still_nr):
     TwoD_plot_robot(int(i),ax2)
     plt.title({int(i)})

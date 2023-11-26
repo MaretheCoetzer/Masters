@@ -35,7 +35,7 @@ import os
 import log
 __logger = log.setup_custom_logger("2D_data_processing")
 
-trajectory_name = 'TwoD_SS_lift_38'
+trajectory_name = 'TwoD_SS_lift_42'
 # Complete: 84,86
 # Failed:
 # 101 not result not found
@@ -110,6 +110,8 @@ th_h4 = Movement.iloc[0:end,9]
 th_k4 = Movement.iloc[0:end,10]
 t = Movement.iloc[0:end,11]
 
+print(f"end: {end}")
+
 for n in range (1,len(t)):
     t[n]=t[n]+t[n-1]
 
@@ -132,34 +134,50 @@ Torque_h3 = Torque.iloc[:,5]
 Torque_k3 = Torque.iloc[:,6]
 Torque_h4 = Torque.iloc[:,7]
 Torque_k4 = Torque.iloc[:,8]
+time=[]
+time.append(0)
+for i in range(1,len(h)):
+    time.append(time[i-1]+h[i])
 
-fig_5,ax_5 = plt.subplots(1)
+# fig_5,ax_5 = plt.subplots(1)
 
-ax_5.plot(range(N),Torque_h1,range(N),Torque_k1,range(N),Torque_h2,range(N),Torque_k2,
-         range(N),Torque_h3,range(N),Torque_k3,range(N),Torque_h4,range(N),Torque_k4)
-ax_5.set_title('Joint Torques Required for Gait')
-ax_5.set_xlabel('Node')
-ax_5.set_ylabel('Torque(Nm)')
-ax_5.legend(['Hip 1','Knee 1','Hip 2','Knee 2','Hip 3','Knee 3','Hip 4','Knee 4'])
-plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_torque.png", transparent=True, bbox_inches='tight',dpi=500) 
+# ax_5.plot(range(N),Torque_h1,range(N),Torque_k1,range(N),Torque_h2,range(N),Torque_k2,
+#          range(N),Torque_h3,range(N),Torque_k3,range(N),Torque_h4,range(N),Torque_k4)
+# ax_5.set_title('Joint Torques Required for Gait')
+# ax_5.set_xlabel('Node')
+# ax_5.set_ylabel('Torque(Nm)')
+# ax_5.legend(['Hip 1','Knee 1','Hip 2','Knee 2','Hip 3','Knee 3','Hip 4','Knee 4'])
+# plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_torque.png", transparent=True, bbox_inches='tight',dpi=500) 
 # plt.show()
 
 fig_6,ax_6 = plt.subplots(1)
 
-Foot_1z = Torque.iloc[:,9]
-Foot_2z = Torque.iloc[:,10]
-Foot_3z = Torque.iloc[:,11]
-Foot_4z = Torque.iloc[:,12]
+Foot_1z = (Torque.iloc[0:end,9])*100
+Foot_2z = (Torque.iloc[0:end,10])*100
+Foot_3z = (Torque.iloc[0:end,11])*100
+Foot_4z = (Torque.iloc[0:end,12])*100
+
+# Foot_1z=[]
+# Foot_2z=[]
+# Foot_3z=[]
+# Foot_4z=[]
+
+# for n in range(N-1):
+#     i=n*3
+#     Foot_1z.append((z[i] + 0.5*l_b*np.cos(th_by[i]) - l_f1*np.cos(th_h1[i]-np.pi/2+th_by[i]) - l_t1*np.cos(th_k1[i]-np.pi/2+th_by[i]+th_h1[i]))*100)
+#     Foot_2z.append((z[i] + 0.5*l_b*np.cos(th_by[i]) - l_f2*np.cos(th_h2[i]-np.pi/2+th_by[i]) - l_t2*np.cos(th_k2[i]-np.pi/2+th_by[i]+th_h2[i]))*100)
+#     Foot_3z.append((z[i] - 0.5*l_b*np.cos(th_by[i]) - l_f3*np.cos(th_h3[i]-np.pi/2+th_by[i]) - l_t3*np.cos(th_k3[i]-np.pi/2+th_by[i]+th_h3[i]))*100)
+#     Foot_4z.append((z[i] - 0.5*l_b*np.cos(th_by[i]) - l_f4*np.cos(th_h4[i]-np.pi/2+th_by[i]) - l_t4*np.cos(th_k4[i]-np.pi/2+th_by[i]+th_h4[i]))*100)
 
 ax_6.plot(range(N),Foot_1z,range(N),Foot_2z,range(N),Foot_3z,range(N),Foot_4z)
 ax_6.set_title('Gait Ground Clearance per Foot')
 ax_6.set_xlabel('Node')
-ax_6.set_ylabel('Ground Clearance (m)')
+ax_6.set_ylabel('Ground Clearance (cm)')
 ax_6.legend(['Foot 1','Foot 2','Foot 3','Foot 4'])
 plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_clearance.png", transparent=True, bbox_inches='tight',dpi=500)
 # plt.show()
 
-fig_7,ax_7 = plt.subplots(1)
+# fig_7,ax_7 = plt.subplots(1)
 
 GRF_1x = Ros.iloc[:,22]
 GRF_1z = Ros.iloc[:,23]
@@ -170,17 +188,20 @@ GRF_3z = Ros.iloc[:,27]
 GRF_4x = Ros.iloc[:,28]
 GRF_4z = Ros.iloc[:,29]
 
-slip_1 = abs(GRF_1x)-GRF_1z
-slip_2 = abs(GRF_2x)-GRF_2z
-slip_3 = abs(GRF_3x)-GRF_3z
-slip_4 = abs(GRF_4x)-GRF_4z
+# plt.plot(range(len(GRF_1x)),GRF_1x,range(len(GRF_2x)),GRF_2x,range(len(GRF_3x)),GRF_3x,range(len(GRF_4x)),GRF_4x)
+# plt.show()
 
-ax_7.plot(range(N*3),slip_1,range(N*3),slip_2,range(N*3),slip_3,range(N*3),slip_4)
-ax_7.set_title('Gait Slippage')
-ax_7.set_xlabel('Node')
-ax_7.set_ylabel('Slip (N)')
-ax_7.legend(['Foot 1','Foot 2','Foot 3','Foot 4'])
-plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_slip.png", transparent=True, bbox_inches='tight',dpi=500)
+slip_1 = GRF_1z-abs(GRF_1x)
+slip_2 = GRF_2z-abs(GRF_2x)
+slip_3 = GRF_3z-abs(GRF_3x)
+slip_4 = GRF_4z-abs(GRF_4x)
+
+# ax_7.plot(np.arange(0,N,1/3),slip_1,np.arange(0,N,1/3),slip_2,np.arange(0,N,1/3),slip_3,np.arange(0,N,1/3),slip_4)
+# ax_7.set_title('Gait GRF')
+# ax_7.set_xlabel('Node')
+# ax_7.set_ylabel('GRF (N)')
+# ax_7.legend(['Foot 1','Foot 2','Foot 3','Foot 4'])
+# plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_slip.png", transparent=True, bbox_inches='tight',dpi=500)
 # plt.show()
 
 __logger.info(f"Travel distance: {x[end-1]-x[0]}")
@@ -221,6 +242,10 @@ def Interpolater(joint,t,step):
 [SS_K3,ss_t] = Interpolater(th_k3,t,step)
 [SS_H4,ss_t] = Interpolater(th_h4,t,step)
 [SS_K4,ss_t] = Interpolater(th_k4,t,step)
+[Foot_1Z,i_t] = Interpolater(Foot_1z,time,step)
+[Foot_2Z,i_t] = Interpolater(Foot_2z,time,step)
+[Foot_3Z,i_t] = Interpolater(Foot_3z,time,step)
+[Foot_4Z,i_t] = Interpolater(Foot_4z,time,step)
 
 print(f"SS_BY[0]={SS_BY[0]}")
 
@@ -397,34 +422,63 @@ def plot_robot_sequence(i,ax,step): #update function for animation
     ax.plot([legf4_xb+offset*step,legt4_xb+offset*step],[legf4_zb,legt4_zb],color='xkcd:blue')
 
 # ___________________________________Videos of linearised gaits_____________________________________________
-fig1, ax1 = plt.subplots(1,1) #create axes
-#ax1.set_aspect('equal')       
-update = lambda i: plot_robot(i,ax1) #lambdify update function
+# fig1, ax1 = plt.subplots(1,1) #create axes
+# #ax1.set_aspect('equal')       
+# update = lambda i: plot_robot(i,ax1) #lambdify update function
 
-animate = ani.FuncAnimation(fig1,update,range(0,len(SS_H1)),interval = 50,repeat=False)
-animate.save(path+"..\..\post_processing\image_sorting\\"+trajectory_name+".gif", writer='PillowWriter', fps=10)
-HTML(animate.to_jshtml())
+# animate = ani.FuncAnimation(fig1,update,range(0,len(SS_H1)),interval = 50,repeat=False)
+# animate.save(path+"..\..\post_processing\image_sorting\\"+trajectory_name+".gif", writer='PillowWriter', fps=10)
+# HTML(animate.to_jshtml())
 
-# _____________________________________Stills of linearised gaits________________________________________________
-# Creates still_nr equally spaced still images of the gait
-still_nr = 20
-sequence = np.array([0,11,28,68,90,108])
-step=range(len(sequence))
+# # _____________________________________Stills of linearised gaits________________________________________________
+# # Creates still_nr equally spaced still images of the gait
+# still_nr = 20
+# sequence = np.array([0,55,64,74,82,92])
+# step=range(len(sequence))
 
-fig2, ax2 = plt.subplots(1,1)
-for i in np.linspace(0,len(SS_H1)-1,still_nr):
-    plot_robot(int(i),ax2)
-    plt.title({int(i)})
-    plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_"+str(int(i))+".png", transparent=True, bbox_inches='tight') #bbox_inches is used to remove excess white around figure
+# fig2, ax2 = plt.subplots(1,1)
+# for i in np.linspace(0,len(SS_H1)-1,still_nr):
+#     plot_robot(int(i),ax2)
+#     plt.title({int(i)})
+#     plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_"+str(int(i))+".png", transparent=True, bbox_inches='tight') #bbox_inches is used to remove excess white around figure
 
-fig3, ax3 = plt.subplots(1,1)    
-for g in step:
-    plot_robot_sequence(sequence[g],ax3,step[g])
-plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_cascade.png", transparent=True, bbox_inches='tight',dpi=500) #bbox_inches is used to remove excess white around figure, dpi(dots per inch) image quality
+# fig3, ax3 = plt.subplots(1,1)    
+# for g in step:
+#     plot_robot_sequence(sequence[g],ax3,step[g])
+# plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_cascade.png", transparent=True, bbox_inches='tight',dpi=500) #bbox_inches is used to remove excess white around figure, dpi(dots per inch) image quality
 
-angles = {'Node':[sequence[i] for i in range(len(sequence))], 'Body':[SS_BY[i]/np.pi*180 for i in sequence], 'Motor 1':[SS_H1[i]/np.pi*180 for i in sequence],'Motor 2':[SS_K1[i]/np.pi*180 for i in sequence],'Motor 3':[SS_H2[i]/np.pi*180 for i in sequence],'Motor 4':[SS_K2[i]/np.pi*180 for i in sequence],
-          'Motor 5':[SS_H3[i]/np.pi*180 for i in sequence],'Motor 6':[SS_K3[i]/np.pi*180 for i in sequence],'Motor 7':[SS_H4[i]/np.pi*180 for i in sequence],'Motor 8':[SS_K4[i]/np.pi*180 for i in sequence]}
-angles = pd.DataFrame(angles)
-print(f" Trajectory Angles:\n {angles}")
-angles.to_csv(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_selected_angles.csv", index = False, header=True)
-print("Complete")
+# angles = {'Node':[sequence[i] for i in range(len(sequence))], 'Body':[SS_BY[i]/np.pi*180 for i in sequence], 'Motor 1':[SS_H1[i]/np.pi*180 for i in sequence],'Motor 2':[SS_K1[i]/np.pi*180 for i in sequence],'Motor 3':[SS_H2[i]/np.pi*180 for i in sequence],'Motor 4':[SS_K2[i]/np.pi*180 for i in sequence],
+#           'Motor 5':[SS_H3[i]/np.pi*180 for i in sequence],'Motor 6':[SS_K3[i]/np.pi*180 for i in sequence],'Motor 7':[SS_H4[i]/np.pi*180 for i in sequence],'Motor 8':[SS_K4[i]/np.pi*180 for i in sequence]}
+# angles = pd.DataFrame(angles)
+# print(f" Trajectory Angles:\n {angles}")
+# angles.to_csv(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_selected_angles.csv", index = False, header=True)
+# print("Complete")
+
+# ________________________________________Clearance relative to time___________________________________
+fig_7,ax_7 = plt.subplots(1)
+
+# Foot_1z = (Torque.iloc[:,9])*100
+# Foot_2z = (Torque.iloc[:,10])*100
+# Foot_3z = (Torque.iloc[:,11])*100
+# Foot_4z = (Torque.iloc[:,12])*100
+
+# Foot_1Z=[]
+# Foot_2Z=[]
+# Foot_3Z=[]
+# Foot_4Z=[]
+
+# time= range(len(SS_H1))
+
+# for i in time:
+#     Foot_1Z.append((Z[i] + 0.5*l_b*np.cos(SS_BY[i]) - l_f1*np.cos(SS_H1[i]-np.pi/2+SS_BY[i]) - l_t1*np.cos(SS_K1[i]-np.pi/2+SS_BY[i]+SS_H1[i]))*100)
+#     Foot_2Z.append((Z[i] + 0.5*l_b*np.cos(SS_BY[i]) - l_f2*np.cos(SS_H2[i]-np.pi/2+SS_BY[i]) - l_t2*np.cos(SS_K2[i]-np.pi/2+SS_BY[i]+SS_H2[i]))*100)
+#     Foot_3Z.append((Z[i] - 0.5*l_b*np.cos(SS_BY[i]) - l_f3*np.cos(SS_H3[i]-np.pi/2+SS_BY[i]) - l_t3*np.cos(SS_K3[i]-np.pi/2+SS_BY[i]+SS_H3[i]))*100)
+#     Foot_4Z.append((Z[i] - 0.5*l_b*np.cos(SS_BY[i]) - l_f4*np.cos(SS_H4[i]-np.pi/2+SS_BY[i]) - l_t4*np.cos(SS_K4[i]-np.pi/2+SS_BY[i]+SS_H4[i]))*100)
+
+ax_7.plot(i_t,Foot_1Z,i_t,Foot_2Z,i_t,Foot_3Z,i_t,Foot_4Z)
+ax_7.set_title('Gait Ground Clearance per Foot')
+ax_7.set_xlabel('Time (s)')
+ax_7.set_ylabel('Ground Clearance (cm)')
+ax_7.legend(['Foot 1','Foot 2','Foot 3','Foot 4'])
+plt.savefig(path+"..\..\post_processing\image_sorting\\"+trajectory_name+"_clearance_t.png", transparent=True, bbox_inches='tight',dpi=500)
+plt.show()
